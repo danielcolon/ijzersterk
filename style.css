@@ -27,7 +27,7 @@
 }
 
 .navbar .container .wrapper{
-	position:fixed;
+	position: absolute;
 	left:50%;
 }
 
