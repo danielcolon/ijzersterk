@@ -46,5 +46,17 @@
 				return "Only accepts GET requests";
 			}
 		}
+		
+		protected function requestinfo()
+		{
+			return json_encode(array(
+				'method'   => $this->method,
+				'endpoint' => $this->endpoint,
+				'verb'     => $this->verb,
+				'args'     => $this->args,
+				'file'     => $this->file,
+				'request'  => $this->request
+			));
+		}
 	}
 ?>

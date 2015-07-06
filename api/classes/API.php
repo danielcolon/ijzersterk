@@ -35,24 +35,32 @@ abstract class API
      * Constructor: __construct
      * Allow for CORS, assemble and pre-process the data
      */
-    public function __construct($request) {
+    public function __construct($request)
+    {
         header("Access-Control-Allow-Orgin: *");
         header("Access-Control-Allow-Methods: *");
         header("Content-Type: application/json");
 
         $this->args = explode('/', rtrim($request, '/'));
         $this->endpoint = array_shift($this->args);
-        if (array_key_exists(0, $this->args) && !is_numeric($this->args[0])) {
+        if(array_key_exists(0, $this->args) && !is_numeric($this->args[0]))
+        {
             $this->verb = array_shift($this->args);
         }
 
         $this->method = $_SERVER['REQUEST_METHOD'];
-        if ($this->method == 'POST' && array_key_exists('HTTP_X_HTTP_METHOD', $_SERVER)) {
-            if ($_SERVER['HTTP_X_HTTP_METHOD'] == 'DELETE') {
+        if($this->method == 'POST' && array_key_exists('HTTP_X_HTTP_METHOD', $_SERVER))
+        {
+            if($_SERVER['HTTP_X_HTTP_METHOD'] == 'DELETE')
+            {
                 $this->method = 'DELETE';
-            } else if ($_SERVER['HTTP_X_HTTP_METHOD'] == 'PUT') {
+            } 
+            else if($_SERVER['HTTP_X_HTTP_METHOD'] == 'PUT')
+            {
                 $this->method = 'PUT';
-            } else {
+            }
+            else
+            {
                 throw new Exception("Unexpected Header");
             }
         }
@@ -75,8 +83,10 @@ abstract class API
         }
     }
     
-     public function processAPI() {
-        if (method_exists($this, $this->endpoint)) {
+     public function processAPI()
+     {
+        if(method_exists($this, $this->endpoint))
+        {
             return $this->_response($this->{$this->endpoint}($this->args));
         }
         return $this->_response("No Endpoint: $this->endpoint", 404);
