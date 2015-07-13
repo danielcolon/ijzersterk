@@ -83,6 +83,37 @@ class user
 		return $this->inDatabase;
 	}
 
+	function getAsAssociativeArray()
+	{
+		return array(
+			"id"          => $this->getId(),
+			"username"    => $this->getUserName(),
+			"lastLogin"   => $this->getLastLogin(),
+			"lastLoginIP" => $this->getLastLoginIP(),
+			"created"     => $this->getCreated(),
+			"isAdmin"     => $this->getIsAdmin(),
+			"firstName"   => $this->getFirstName(),
+			"lastName"    => $this->getLastName(),
+			"email"       => $this->getEmail()
+		);
+	}
+	
+	/*
+	private $id;
+	private $username;
+	private $lastLogin;
+	private $lastLoginIP;
+	private $created;
+	private $password;
+	private $cookie;
+	private $isAdmin;
+	private $firstName;
+	private $lastName;
+	private $email;
+	private $isChanged;
+	private $inDatabase;
+	*/
+
 	//Setters
 	function setId($AId)
 	{
@@ -167,6 +198,59 @@ class user
 		$this->lastLoginDate = new DateTime;
 	}
 
+	function login($AUsername = null, $APassword = null)
+	{
+		// Attempts to login and fill the user
+		// Returns json array with either succes or failure
+
+		if(!is_null($AUsername) && !is_null($APassword))
+		{
+			$dirname = dirname(__FILE__);
+			require("$dirname/../settings.php");
+			$DBTable  = 'users';
+
+			//Connect to database
+			$connection = new mysqli($DBServer, $DBUser, $DBPass, $DBName);
+
+			// Check connection
+			if ($connection->connect_error)
+			{
+				trigger_error('Error connecting to database: ' . $connection->error, E_USER_WARNING);
+				return json_encode(array("error" => "500 Internal Server Error","details" => "Couldn't connect to database"));
+			}
+
+			//Clean up
+			$AUsername = mysqli_real_escape_string($connection, $AUsername);
+			$APassword = mysqli_real_escape_string($connection, $APassword);
+
+			trigger_error("$AUsername, $APassword", E_USER_NOTICE);
+
+			//Create and attempt to fill user
+			$this->setUsername($AUsername);
+			if($this->fill($connection))
+			{
+				if($this->checkPassword($APassword))
+				{
+					$_SESSION['user'] = serialize($this);
+
+					//setLoginCookie($connection);
+					return json_encode(array("result" => "200 OK", "details" => "User logged in.","user" => $this->getAsAssociativeArray()));
+
+					//Close connection
+					mysqli_close($connection);
+				}
+				else
+				{
+					return json_encode(array("error" => "401 Unauthorized","details" => "Invalid credentials supplied"));
+				}
+			}
+			else
+			{
+				return json_encode(array("error" => "401 Unauthorized","details" => "Invalid credentials supplied"));
+			}
+		}
+	}
+	
 	function checkPassword($APassword)
 	{
 		if(is_null($this->password))

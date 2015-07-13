@@ -18,7 +18,7 @@
 		if(!$receivedConnection)
 		{
 			$dirname = dirname(__FILE__);
-			require_once("$dirname/../settings.php");
+			require("$dirname/../settings.php");
 
 			//Connect to database
 			$connection = new mysqli($DBServer, $DBUser, $DBPass, $DBName);
@@ -93,7 +93,7 @@
 	{
 		//Load external PHP scripts
 		$dirname = dirname(__FILE__);
-		require_once("$dirname/../classes/user.php");
+		require("$dirname/../classes/user.php");
 
 		//connection
 		$DBTable  = 'users';

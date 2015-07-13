@@ -1,5 +1,6 @@
 <?php
 	require_once 'API.php';
+
 	class ijzersterkAPI extends API
 	{
 		protected $User;
@@ -64,8 +65,9 @@
 			$dirname = dirname(__FILE__);
 			require_once("$dirname/user.php");
 			require_once("$dirname/../lib/cookies.php");
+			require_once("$dirname/../lib/sessions.php");
 	
-			//Login
+			// Login
 			if($this->verb == "login" && $this->method == 'PUT')
 			{
 				$PUTArray = json_decode($this->file, true);
@@ -74,53 +76,43 @@
 				{
 					return json_encode(array("error" => "400 Bad Request","details" => "Couldn't decode json in PUT data"));
 				}
+
 				// Get the username and password
-				$AUserName = $PUTArray["username"];
-				$APassWord = $PUTArray["password"];
+				$AUsername = $PUTArray["username"];
+				$APassword = $PUTArray["password"];
 
 				// Check if we got those
-				if(is_null($AUserName) || is_null($APassWord))
+				if(is_null($AUsername) || is_null($APassword))
 				{
 					return json_encode(array("error" => "400 Bad Request","details" => "Username or password missing from PUT data"));
 				}
 
-				//Connect to database
-				$connection = new mysqli($DBServer, $DBUser, $DBPass, $DBName);
-				
-				// Check connection
-				if ($connection->connect_error)
-				{
-					trigger_error('Error connecting to database: ' . $connection->error, E_USER_WARNING);
-					return json_encode(array("error" => "500 Internal Server Error","details" => "Couldn't connect to database"));
-				}
-
-				//Clean up
-				$AUserName = mysqli_real_escape_string($connection, $AUserName);
-				$APassWord = mysqli_real_escape_string($connection, $APassWord);
-
-				//Create and attempt to fill user
 				$AUser = new user;
-				$AUser->setUsername($AUserName);
-				if($AUser->fill($connection))
+				return $AUser->login($AUsername, $APassword);
+			}
+
+			// Get all users
+			else if($this->verb == "" && $this->method == 'GET')
+			{
+				// Check if we're logged in
+				if(userLoggedIn())
 				{
-					if($AUser->checkPassword($APassWord))
+					// Now get the user
+					$AUser = $_SESSION['user'];
+
+					// Only admins can see all users
+					if($AUser->getIsAdmin())
 					{
-						$_SESSION['user'] = serialize($AUser);
-
-						setLoginCookie($connection);
-						return json_encode(array("result" => "200 OK", "details" => "User logged in.","user" => $AUser));
-
-						//Close connection
-						mysqli_close($connection);
+						return json_encode(array("result" => "200 OK", "details" => "User list retrieved"));
 					}
 					else
 					{
-						return json_encode(array("error" => "401 Unauthorized","details" => "Invalid credentials supplied"));
+						return json_encode(array("error" => "403 Forbidden","details" => "Admin rights required"));
 					}
 				}
 				else
 				{
-					return json_encode(array("error" => "401 Unauthorized","details" => "Invalid credentials supplied"));
+					return json_encode(array("error" => "401 Unauthorized","details" => "User not logged in"));
 				}
 			}
 		}

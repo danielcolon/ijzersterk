@@ -1,0 +1,39 @@
+// Add Jquery
+var jq = document.createElement('script');
+jq.src = "https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js";
+document.getElementsByTagName('head')[0].appendChild(jq);
+
+// Log in
+var data = {username:"testuser",password:"testpass"};
+jQuery.ajax({
+	type: 'PUT',
+	url: "http://api.ijzersterkdelft.nl/user/login",
+	contentType: "application/json",
+	dataType: "json",
+	data: JSON.stringify(data),
+	beforeSend: function( xhr ){
+		xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
+	}
+})
+.done(function( data ) {
+	if ( console && console.log ) {
+		console.log(data);
+	}
+});
+
+// Get all users
+jQuery.ajax({
+	type: 'GET',
+	url: "http://api.ijzersterkdelft.nl/user",
+	contentType: "application/json",
+	dataType: "json",
+	data: JSON.stringify(data),
+	beforeSend: function( xhr ){
+		xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
+	}
+})
+.done(function( data ) {
+	if ( console && console.log ) {
+		console.log(data);
+	}
+});
