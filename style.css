@@ -9,7 +9,6 @@
 
 .navbar .container {
 	padding-top: 30px;
-	height: 200px;
 }
 .navbar-inverse .navbar-nav>li>a{
 	color:white;
@@ -26,20 +25,13 @@
 	color: #B82605;
 }
 
-.navbar .container .wrapper{
-	position: absolute;
-	left:50%;
-}
-
-.navbar .container .wrapper .logo{
+.navbar .container .logo{
 	background-image: url("img/logowit.svg");
 	background-size: contain;
 	background-repeat: no-repeat;
-	background-position: center;
-	height: 100px;
-	width: 200px;
-	position:relative; 
-	left:-50%;
+	height: 200px;
+	width: 300px;
+	margin: -70px auto 10px auto;
 }
 
 /* MAIN */
