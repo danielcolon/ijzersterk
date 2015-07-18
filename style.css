@@ -1,3 +1,10 @@
+body{
+	font-family: 'Roboto',sans-serif;
+	font-size:16px;
+	color:#222;
+	font-weight:300;
+	line-height: 1.625;
+}
 /* NAVBAR */
 .navbar {
 	border-radius: 0px;
@@ -48,6 +55,24 @@
 
 .item {
 	padding:20px;
+}
+
+/* SIDEBAR */
+.sidebar{
+	margin-top: 35px;
+}
+
+.block{
+	margin-bottom: 20px;
+}
+
+.block ul {
+	margin-left: -40px;
+}
+
+.block li {
+	list-style: none;
+	margin:5px 0;
 }
 
 /* FOOTER */
