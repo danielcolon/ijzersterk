@@ -34,19 +34,20 @@
 	margin: -70px auto 10px auto;
 }
 
-/* MAIN */
-.main {
+/* ITEM */
+.description{
+	font-size:22px;
+	color:#999;
 }
 
-/* ITEM */
+.crop-img-300{
+	overflow: hidden;
+	height: 300px; 
+	margin: 10px 0;
+}
+
 .item {
 	padding:20px;
-}
-
-.item img{
-	margin: 10px 0 10px 0;
-	max-height: 200px;
-	margin-left: 30%;
 }
 
 /* FOOTER */
