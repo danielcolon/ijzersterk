@@ -77,11 +77,46 @@
 				// Only admins can see all users
 				if($this->currentUser->getIsAdmin())
 				{
-					$this->responseCode = 200;
-					return json_encode(array("result" => "200 OK", "details" => "User list retrieved"));
+					$AUsers = new users;
+					if($AUsers->fill())
+					{
+						$this->responseCode = 200;
+						return json_encode(array("result" => "200 OK", "users" => $AUsers->getAsArray()));
+					}
+					else
+					{
+						$this->responseCode = 500;
+						return json_encode(array("error" => "500 Internal Server Error","details" => "Couldn't load users"));
+					}
 				}
 				$this->responseCode = 403;
 				return json_encode(array("error" => "403 Forbidden","details" => "Admin rights required"));
+			}
+			else if($this->method == 'GET')
+			{
+				// Only let admins or the user themselves see the user
+				if($this->verb == $this->currentUser->getUsername() || $this->currentUser->getIsAdmin())
+				{
+					// See if t's the logged in user, if so, return it
+					if($this->verb == $this->currentUser->getUsername())
+					{
+						$this->responseCode = 200;
+						return json_encode(array("result" => "200 OK", "user" => $this->currentUser->getAsAssociativeArray()));
+					}
+
+					// Try to fill for the given username
+					$Auser = new user;
+					$Auser->setUsername($this->verb);
+					if($Auser->fill())
+					{
+						return json_encode(array("result" => "200 OK", "user" => $Auser->getAsAssociativeArray()));
+					}
+					else
+					{
+						$this->responseCode = 404;
+						return json_encode(array("error" => "404 Not Found","details" => "Couldn't find user " . $this->verb));
+					}
+				}
 			}
 			
 			/* Login (Might still want to use some of this when implementing OAuth)

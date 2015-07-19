@@ -80,6 +80,11 @@
 				trigger_error("Query failed: "  . mysqli_error($this->Connection) . " with query $AQuery ", E_USER_WARNING);
 				return false;
 			}
+			else if($this->QueryResult->num_rows <= 0)
+			{
+				trigger_error("Empty query result", E_USER_WARNING);
+				return false;
+			}
 			else
 			{
 				return true;

@@ -269,7 +269,7 @@ class user
 	}
 
 	//Fill
-	function fill($ADatabase)
+	function fill($ADatabase = null)
 	{
 		if(is_null($this->getId()) && is_null($this->getUsername()))
 		{
@@ -308,12 +308,9 @@ class user
 				$query = "SELECT * FROM users WHERE username = '" . $this->getUsername() . "';";
 			}
 			if($ADatabase->query($query))
-			$userQueryResult = $ADatabase->QueryResult;
-
-			if($userQueryResult)
 			{
 				//Load user data
-				$row = $userQueryResult->fetch_assoc();
+				$row = $ADatabase->QueryResult->fetch_assoc();
 
 				$this->setId($row['id']);
 				$this->setUsername($row['username']);
@@ -417,6 +414,63 @@ class user
 
 		$Database->disconnect();
 		return FALSE;
+	}
+}
+
+class users
+{
+	private $users = array();
+
+	function fill($ADatabase = null)
+	{
+		//Initialise variables
+		$dirname = dirname(__FILE__);
+		require_once("$dirname/database.php");
+		$DBTable  = 'users';
+
+		//Make connection if we didn't get one
+		$receivedConnection = !is_null($ADatabase);
+		if(!$receivedConnection)
+		{
+			// Make one
+			$ADatabase = new TDatabase;
+			// Make connection
+			if(!$ADatabase->Connect())
+			{
+				return false;
+			}
+		}
+
+		// Get all the users
+		$query = "SELECT * FROM $DBTable;";
+
+		if($ADatabase->query($query))
+		{
+			while($row = mysqli_fetch_assoc($ADatabase->QueryResult))
+			{
+				trigger_error('while', E_USER_NOTICE);
+				array_push($this->users, $row['username']);
+			}
+
+			$result = true;
+		}
+		else
+		{
+			$result = false;
+		}
+
+		if(!$receivedConnection)
+		{
+			//Close database connection only if we made it ourselves
+			$ADatabase->disconnect();
+		}
+
+		return $result;
+	}
+
+	function getAsArray()
+	{
+		return $this->users;
 	}
 }
 ?>
