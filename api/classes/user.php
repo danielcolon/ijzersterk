@@ -206,45 +206,35 @@ class user
 		if(!is_null($AUsername) && !is_null($APassword))
 		{
 			$dirname = dirname(__FILE__);
-			require("$dirname/../settings.php");
+			require("$dirname/database.php");
 			$DBTable  = 'users';
 
 			//Connect to database
-			$connection = new mysqli($DBServer, $DBUser, $DBPass, $DBName);
+			$database = new TDatabase;
 
 			// Check connection
-			if ($connection->connect_error)
+			if(!$database->connect())
 			{
-				trigger_error('Error connecting to database: ' . $connection->error, E_USER_WARNING);
-				//return json_encode(array("error" => "500 Internal Server Error","details" => "Couldn't connect to database"));
 				return false;
 			}
 
 			//Clean up
-			$AUsername = mysqli_real_escape_string($connection, $AUsername);
-			$APassword = mysqli_real_escape_string($connection, $APassword);
-
-			//trigger_error("$AUsername, $APassword", E_USER_NOTICE);
+			$AUsername = $database->Clean($AUsername);
+			$APassword = $database->Clean($APassword);
 
 			//Create and attempt to fill user
 			$this->setUsername($AUsername);
-			if($this->fill($connection))
+			if($this->fill($database))
 			{
 				if($this->checkPassword($APassword))
 				{
-					//$_SESSION['user'] = serialize($this);
-
-					//setLoginCookie($connection);
-					//return json_encode(array("result" => "200 OK", "details" => "User logged in.","user" => $this->getAsAssociativeArray()));
+					$database->disconnect();
 					return true;
-
-					//Close connection
-					mysqli_close($connection);
 				}
 				else
 				{
-					//return json_encode(array("error" => "401 Unauthorized","details" => "Invalid credentials supplied"));
-					trigger_error("Invalid credentials supplied for username: $AUsername", E_USER_NOTICE);
+					trigger_error("Invalid password supplied for username: $AUsername", E_USER_NOTICE);
+					$database->disconnect();
 					return false;
 				}
 			}
@@ -252,6 +242,7 @@ class user
 			{
 				//return json_encode(array("error" => "401 Unauthorized","details" => "Invalid credentials supplied"));
 				trigger_error("Invalid credentials supplied for username: $AUsername", E_USER_NOTICE);
+				$database->disconnect();
 				return false;
 			}
 		}
@@ -261,7 +252,7 @@ class user
 	{
 		if(is_null($this->password))
 		{
-			trigger_error('No password set in user object', E_USER_ERROR);
+			trigger_error('No password set in user object', E_USER_WARNING);
 			return FALSE;
 		}
 		else
@@ -270,11 +261,15 @@ class user
 			{
 				return TRUE;
 			}
+			else
+			{
+				return FALSE;
+			}
 		}
 	}
 
 	//Fill
-	function fill($AConnection)
+	function fill($ADatabase)
 	{
 		if(is_null($this->getId()) && is_null($this->getUsername()))
 		{
@@ -285,20 +280,19 @@ class user
 			$result = false;
 
 			//Initialise variables
-			global $DBServer, $DBUser, $DBPass, $DBName;
+			$dirname = dirname(__FILE__);
+			require_once("$dirname/database.php");
 			$DBTable  = 'users';
 
 			//Make connection if we didn't get one
-			$receivedConnection = isset($AConnection);
+			$receivedConnection = isset($ADatabase);
 			if(!$receivedConnection)
 			{
-				//Connect to database
-				$AConnection = new mysqli($DBServer, $DBUser, $DBPass, $DBName);
-
-				// Check connection
-				if ($AConnection -> connect_error)
+				// Make one
+				$ADatabase = new TDatabase;
+				// Make connection
+				if (!$ADatabase->Connect())
 				{
-					trigger_error('Database connection failed: '  . $AConnection -> connect_error, E_USER_ERROR);
 					return false;
 				}
 			}
@@ -313,7 +307,9 @@ class user
 			{
 				$query = "SELECT * FROM users WHERE username = '" . $this->getUsername() . "';";
 			}
-			$userQueryResult = $AConnection->query($query);
+			if($ADatabase->query($query))
+			$userQueryResult = $ADatabase->QueryResult;
+
 			if($userQueryResult)
 			{
 				//Load user data
@@ -338,14 +334,14 @@ class user
 			}
 			else
 			{
-				trigger_error("User query result was empty. Query: $query", E_USER_ERROR);
+				trigger_error("User query result was empty. Query: $query", E_USER_WARNING);
 				$result = false;
 			}
 
 			if(!$receivedConnection)
 			{
 				//Close database connection only if we made it ourselves
-				mysqli_close($connection);
+				$ADatabase->disconnect();
 			}
 
 			return $result;

@@ -3,12 +3,27 @@
 
 	class ijzersterkAPI extends API
 	{
-		protected $User;
+		protected $currentUser;
 
 		public function __construct($request, $origin)
 		{
 			parent::__construct($request);
 
+			// Might do stuff here later
+		}
+
+		public function processAPI()
+		{
+			// We'll allow anyone to access certain functions
+			$publicFunctions = array(
+			'requestinfo'
+			);
+			if(in_array($this->endpoint, $publicFunctions))
+			{
+				return parent::processAPI();
+			}
+
+			// Extend our parent's function and log in the user before processing the rest of the request
 			$dirname = dirname(__FILE__);
 			require_once("$dirname/user.php");
 			require_once("$dirname/../lib/cookies.php");
@@ -19,36 +34,19 @@
 			if(!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']))
 			{
 				$this->responseCode = 400;
-				return (json_encode(array("error" => "400 Bad Request","details" => "Username or password not provided")));
+				return(json_encode(array("error" => "400 Bad Request","details" => "Username or password not provided")));
 			}
 
-			$this->User = new user;
-			if(!$this->User->login($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']))
+			$this->currentUser = new user;
+			if(!$this->currentUser->login($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']))
 			{
 				//return json_encode(array("error" => "401 Unauthorized", "details" => "Invalid credentials supplied"));
 				$this->responseCode = 401;
-				return (json_encode(array("error" => "401 Unauthorized", "details" => "Invalid credentials supplied")));
+				return(json_encode(array("error" => "401 Unauthorized", "details" => "Invalid credentials supplied")));
 			}
-		}
-
-		/**
-		* Example of an Endpoint
-		*/
-		protected function example()
-		{
-			if($this->method == 'GET')
-			{
-				return "You just got example!";
-				//return "Your name is " . $this->User->name;
-			}
-			elseif($this->method == 'PUT')
-			{
-				return "You just PUT: " . $this->file;
-			}
-			else
-			{
-				return "Only accepts GET requests";
-			}
+			
+			// Thén do the actual processing
+			return parent::processAPI();
 		}
 
 		// Show sender what he sent for debugging
@@ -73,7 +71,20 @@
 			require_once("$dirname/../lib/cookies.php");
 			require_once("$dirname/../lib/sessions.php");
 	
-			/* Login
+			if($this->verb == "" && $this->method == 'GET')
+			{
+				//Return a list of usernames
+				// Only admins can see all users
+				if($this->currentUser->getIsAdmin())
+				{
+					$this->responseCode = 200;
+					return json_encode(array("result" => "200 OK", "details" => "User list retrieved"));
+				}
+				$this->responseCode = 403;
+				return json_encode(array("error" => "403 Forbidden","details" => "Admin rights required"));
+			}
+			
+			/* Login (Might still want to use some of this when implementing OAuth)
 			if($this->verb == "login" && $this->method == 'PUT')
 			{
 				$PUTArray = json_decode($this->file, true);
@@ -98,32 +109,7 @@
 			}
 
 			// Get all users
-			else */if($this->verb == "" && $this->method == 'GET')
-			{
-				// Check if we're logged in
-				if(userLoggedIn())
-				{
-					// Now get the user
-					$AUser = $_SESSION['user'];
-
-					// Only admins can see all users
-					if($AUser->getIsAdmin())
-					{
-						$this->responseCode = 200;
-						return json_encode(array("result" => "200 OK", "details" => "User list retrieved"));
-					}
-					else
-					{
-						$this->responseCode = 403;
-						return json_encode(array("error" => "403 Forbidden","details" => "Admin rights required"));
-					}
-				}
-				else
-				{
-					$this->responseCode = 401;
-					return json_encode(array("error" => "401 Unauthorized","details" => "User not logged in"));
-				}
-			}
+			else */
 		}
 	}
 ?>
