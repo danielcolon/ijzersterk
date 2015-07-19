@@ -201,7 +201,7 @@ class user
 	function login($AUsername = null, $APassword = null)
 	{
 		// Attempts to login and fill the user
-		// Returns json array with either succes or failure
+		// Return false or true for succes or failure. Logs error to error log
 
 		if(!is_null($AUsername) && !is_null($APassword))
 		{
@@ -216,14 +216,15 @@ class user
 			if ($connection->connect_error)
 			{
 				trigger_error('Error connecting to database: ' . $connection->error, E_USER_WARNING);
-				return json_encode(array("error" => "500 Internal Server Error","details" => "Couldn't connect to database"));
+				//return json_encode(array("error" => "500 Internal Server Error","details" => "Couldn't connect to database"));
+				return false;
 			}
 
 			//Clean up
 			$AUsername = mysqli_real_escape_string($connection, $AUsername);
 			$APassword = mysqli_real_escape_string($connection, $APassword);
 
-			trigger_error("$AUsername, $APassword", E_USER_NOTICE);
+			//trigger_error("$AUsername, $APassword", E_USER_NOTICE);
 
 			//Create and attempt to fill user
 			$this->setUsername($AUsername);
@@ -231,22 +232,27 @@ class user
 			{
 				if($this->checkPassword($APassword))
 				{
-					$_SESSION['user'] = serialize($this);
+					//$_SESSION['user'] = serialize($this);
 
 					//setLoginCookie($connection);
-					return json_encode(array("result" => "200 OK", "details" => "User logged in.","user" => $this->getAsAssociativeArray()));
+					//return json_encode(array("result" => "200 OK", "details" => "User logged in.","user" => $this->getAsAssociativeArray()));
+					return true;
 
 					//Close connection
 					mysqli_close($connection);
 				}
 				else
 				{
-					return json_encode(array("error" => "401 Unauthorized","details" => "Invalid credentials supplied"));
+					//return json_encode(array("error" => "401 Unauthorized","details" => "Invalid credentials supplied"));
+					trigger_error("Invalid credentials supplied for username: $AUsername", E_USER_NOTICE);
+					return false;
 				}
 			}
 			else
 			{
-				return json_encode(array("error" => "401 Unauthorized","details" => "Invalid credentials supplied"));
+				//return json_encode(array("error" => "401 Unauthorized","details" => "Invalid credentials supplied"));
+				trigger_error("Invalid credentials supplied for username: $AUsername", E_USER_NOTICE);
+				return false;
 			}
 		}
 	}

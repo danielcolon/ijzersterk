@@ -9,23 +9,24 @@
 		{
 			parent::__construct($request);
 
-			/*
-			// Abstracted out for example
-			$APIKey = new Models\APIKey();
-			$User = new Models\User();
+			$dirname = dirname(__FILE__);
+			require_once("$dirname/user.php");
+			require_once("$dirname/../lib/cookies.php");
+			require_once("$dirname/../lib/sessions.php");
 
-			if (!array_key_exists('apiKey', $this->request)) {
-				throw new Exception('No API Key provided');
-			} else if (!$APIKey->verifyKey($this->request['apiKey'], $origin)) {
-				throw new Exception('Invalid API Key');
-			} else if (array_key_exists('token', $this->request) &&
-				!$User->get('token', $this->request['token'])) {
-
-				throw new Exception('Invalid User Token');
+			//Authenticate the user for every call
+			// Get the username and password from the header
+			if(!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']))
+			{
+				throw new Exception(json_encode(array("error" => "400 Bad Request","details" => "Username or password not provided")));
 			}
-			*/
 
-			//$this->User = $User;
+			$this->User = new user;
+			if(!$this->User->login($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']))
+			{
+				//return json_encode(array("error" => "401 Unauthorized", "details" => "Invalid credentials supplied"));
+				throw new Exception(json_encode(array("error" => "401 Unauthorized", "details" => "Invalid credentials supplied")));
+			}
 		}
 
 		/**
@@ -47,7 +48,8 @@
 				return "Only accepts GET requests";
 			}
 		}
-		
+
+		// Show sender what he sent for debugging
 		protected function requestinfo()
 		{
 			return json_encode(array(
@@ -56,7 +58,9 @@
 				'verb'     => $this->verb,
 				'args'     => $this->args,
 				'file'     => $this->file,
-				'request'  => $this->request
+				'request'  => $this->reques,
+				'user'     => isset($_SERVER['PHP_AUTH_USER']) ? $_SERVER['PHP_AUTH_USER'] : 'No user provided',
+				'password' => isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : 'No password provided'
 			));
 		}
 		
