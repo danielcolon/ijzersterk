@@ -16,7 +16,8 @@
 		{
 			// We'll allow anyone to access certain functions
 			$publicFunctions = array(
-			'requestinfo'
+			'requestinfo',
+			'temp'
 			);
 			if(in_array($this->endpoint, $publicFunctions))
 			{
@@ -44,7 +45,7 @@
 				$this->responseCode = 401;
 				return(json_encode(array("error" => "401 Unauthorized", "details" => "Invalid credentials supplied")));
 			}
-			
+
 			// Thén do the actual processing
 			return parent::processAPI();
 		}
@@ -62,6 +63,21 @@
 				'user'     => isset($_SERVER['PHP_AUTH_USER']) ? $_SERVER['PHP_AUTH_USER'] : 'No user provided',
 				'password' => isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : 'No password provided'
 			));
+		}
+		
+		protected function temp()
+		{
+			$dirname = dirname(__FILE__);
+			require_once("$dirname/user.php");
+
+			// Create a user
+			$AUser = new user;
+			$AUser->setUsername("dcolon");
+			$AUser->fill();
+			$AUser->setPassword(password_hash("testpass", PASSWORD_DEFAULT));
+			trigger_error("Password set to: " . $AUser->getPassword(), E_USER_NOTICE);
+			$AUser->addToDatabase();
+			return "succes";
 		}
 		
 		protected function user()
@@ -118,7 +134,71 @@
 					}
 				}
 			}
-			
+			else if($this->verb != "" && $this->method == 'PUT')
+			{
+				// We're either going to make a new user or update one
+				// Either way you can only change your own user unless you're an admin
+				if($this->verb == $this->currentUser->getUsername() || $this->currentUser->getIsAdmin())
+				{
+					// Create a user
+					$AUser = new user;
+					$AUser->setUsername($this->verb);
+
+					// Get the data being put
+					$PUTArray = json_decode($this->file, true);
+
+					// Check if it worked
+					if(is_null($PUTArray))
+					{
+						$this->responseCode = 400;
+						return json_encode(array("error" => "400 Bad Request","details" => "Couldn't decode json input data"));
+					}
+
+					if(!$AUser->fill() && !isset($PUTArray["password"]))
+					{
+						$this->responseCode = 400;
+						//If the user doesn't exist yet we need to make sure there's a new password in the data
+						return json_encode(array("error" => "400 Bad Request","details" => "No password provided for new user"));
+					}
+
+					// Remember if we're a new user
+					$isNew = !$AUser->getInDatabase();
+
+					// If we get a password we'll have to hash it
+					if(isset($PUTArray["password"]))
+					{
+						$AUser->setPassword(password_hash($PUTArray["password"], PASSWORD_DEFAULT));
+					}
+
+					// Now get the other stuff
+					$AUser->setUsername($this->verb);
+					if(isset($PUTArray["isadmin"]) && $this->currentUser->getIsAdmin()) $AUser->setIsAdmin($PUTArray["isadmin"]); // Only let admins set isadmin
+					if(isset($PUTArray["firstname"])) $AUser->setUsername($PUTArray["firstname"]);
+					if(isset($PUTArray["lastname"])) $AUser->setUsername($PUTArray["lastname"]);
+					if(isset($PUTArray["email"])) $AUser->setUsername($PUTArray["email"]);
+
+					// The user object will handle whether we'll add a user or update a user depending on if
+					// it was found in the database or not
+					if($AUser->addToDatabase())
+					{
+						if($isNew) 
+						{
+							$this->responseCode = 201;
+							return json_encode(array("result" => "201 Created", "details" => "New user succesfully created"));
+						}
+						else
+						{
+							$this->responseCode = 200;
+							return json_encode(array("result" => "200 Ok", "details" => "User succesfully"));
+						}
+					}
+				}
+			}
+
+			// Apparantly somethign went wrong if we still haven't returned
+			$this->responseCode = 400;
+			return json_encode(array("error" => "400 Bad Request","details" => "Nothing was done"));
+
 			/* Login (Might still want to use some of this when implementing OAuth)
 			if($this->verb == "login" && $this->method == 'PUT')
 			{
@@ -141,10 +221,7 @@
 
 				$AUser = new user;
 				return $AUser->login($AUsername, $APassword);
-			}
-
-			// Get all users
-			else */
+			}*/
 		}
 	}
 ?>

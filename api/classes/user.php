@@ -13,14 +13,14 @@ class user
 	private $lastLogin;
 	private $lastLoginIP;
 	private $created;
-	private $password;
+	private $password; //this is the hash + salt
 	private $cookie;
 	private $isAdmin;
 	private $firstName;
 	private $lastName;
 	private $email;
-	private $isChanged;
-	private $inDatabase;
+	private $isChanged = false;
+	private $inDatabase = false;
 
 	//Getters
 	function getId()
@@ -35,7 +35,26 @@ class user
 
 	function getLastLogin()
 	{
-		return $this->lastLogin;
+		if(isset($this->lastLogin))
+		{
+			return $this->lastLogin;
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	function getLastLoginAsString()
+	{
+		if(isset($this->lastLogin))
+		{
+			return $this->getLastLogin()->format('Y-m-d H:i:s');
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	function getLastLoginIP()
@@ -45,7 +64,23 @@ class user
 
 	function getCreated()
 	{
+		// Check if we just got created
+		if(!isset($this->created))
+		{
+			// If so, return now
+			return new DateTime;
+		}
 		return $this->created;
+	}
+
+	function getCreatedAsString()
+	{
+		return $this->getCreated()->format('Y-m-d H:i:s');
+	}
+
+	function getPassword()
+	{
+		return $this->password;
 	}
 
 	function getCookie()
@@ -88,31 +123,15 @@ class user
 		return array(
 			"id"          => $this->getId(),
 			"username"    => $this->getUserName(),
-			"lastLogin"   => $this->getLastLogin(),
+			"lastLogin"   => $this->getLastLoginAsString(),
 			"lastLoginIP" => $this->getLastLoginIP(),
-			"created"     => $this->getCreated(),
+			"created"     => $this->getCreatedAsString(),
 			"isAdmin"     => $this->getIsAdmin(),
 			"firstName"   => $this->getFirstName(),
 			"lastName"    => $this->getLastName(),
 			"email"       => $this->getEmail()
 		);
 	}
-	
-	/*
-	private $id;
-	private $username;
-	private $lastLogin;
-	private $lastLoginIP;
-	private $created;
-	private $password;
-	private $cookie;
-	private $isAdmin;
-	private $firstName;
-	private $lastName;
-	private $email;
-	private $isChanged;
-	private $inDatabase;
-	*/
 
 	//Setters
 	function setId($AId)
@@ -129,13 +148,20 @@ class user
 
 	function setLastLogin($ALastLogin)
 	{
-		if($ALastLogin instanceof DateTime)
+		if(gettype($ALastLogin) == "string")
 		{
-			$this->lastLoginDate = $ALastLogin;
+			if($ALastLogin == "0000-00-00 00:00:00")
+			{
+				unset($this->lastLogin);
+			}
+			else
+			{
+				$this->lastLogin = DateTime::createFromFormat('Y-m-d H:i:s', $ALastLogin);
+			}
 		}
 		else
 		{
-			$this->lastLoginDate = strtotime($ALastLogin);
+			$this->lastLogin = $ALastLogin;
 		}
 		$this->isChanged = TRUE;
 	}
@@ -146,9 +172,30 @@ class user
 		$this->isChanged = TRUE;
 	}
 
+	function setPassword($APassword)
+	{
+		$this->password = $APassword;
+		trigger_error("Password set to: " . $this->password, E_USER_NOTICE);
+		$this->isChanged = TRUE;
+	}
+
 	function setCreated($ACreated)
 	{
-		$this->created = $ACreated;
+		if(gettype($ACreated) == "string")
+		{
+			if($ACreated == "0000-00-00 00:00:00")
+			{
+				unset($this->created);
+			}
+			else
+			{
+				$this->created = DateTime::createFromFormat('Y-m-d H:i:s', $ACreated);
+			}
+		}
+		else
+		{
+			$this->created = $ALastLogin;
+		}
 		$this->isChanged = TRUE;
 	}
 
@@ -195,7 +242,9 @@ class user
 	//Construct
 	function __construct()
 	{
-		$this->lastLoginDate = new DateTime;
+		// Always initialise dates so php doesn't fuck up
+		//$this->lastLogin = new DateTime;
+		//$this->created   = new DateTime;
 	}
 
 	function login($AUsername = null, $APassword = null)
@@ -357,12 +406,11 @@ class user
 		{
 			$SQL="
 				UPDATE `users` SET 
-					id = '" . $this->getId() . "',
 					username = '" . $this->getUserName() . "',
 					password = '" . $this->getPassword() . "',
-					lastlogin = '" . $this->getLastLogin() . "',
+					lastlogin = '" . $this->getLastLoginAsString() . "',
 					lastloginip = '" . $this->getLastLoginIP() . "',
-					created = '" . $this->getCreated() . "',
+					created = '" . $this->getCreatedAsString() . "',
 					cookie = '" . $this->getCookie() . "',
 					isadmin = '" . $this->getIsAdmin() . "',
 					firstname = '" . $this->getFirstName() . "',
@@ -372,15 +420,12 @@ class user
 		}
 		else
 		{
-			//Add it (yes I auto generated all these)
+			//It doesn't exist so add it (yes I auto generated all these)
 			//Rewrite this someday to build these queries by looping through variables in object
 			$SQL="
 				INSERT INTO `users`  (
-					id,
 					username,
 					password,
-					lastlogin,
-					lastloginip,
 					created,
 					cookie,
 					isadmin,
@@ -388,12 +433,9 @@ class user
 					lastname,
 					email)
 				VALUES (
-					'" . $this->getId() . "',
 					'" . $this->getUserName() . "',
 					'" . $this->getPassword() . "',
-					'" . $this->getLastLogin() . "',
-					'" . $this->getLastLoginIP() . "',
-					'" . $this->getCreated() . "',
+					'" . $this->getCreatedAsString() . "',
 					'" . $this->getCookie() . "',
 					'" . $this->getIsAdmin() . "',
 					'" . $this->getFirstName() . "',
