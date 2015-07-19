@@ -18,14 +18,16 @@
 			// Get the username and password from the header
 			if(!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']))
 			{
-				throw new Exception(json_encode(array("error" => "400 Bad Request","details" => "Username or password not provided")));
+				$this->responseCode = 400;
+				return (json_encode(array("error" => "400 Bad Request","details" => "Username or password not provided")));
 			}
 
 			$this->User = new user;
 			if(!$this->User->login($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']))
 			{
 				//return json_encode(array("error" => "401 Unauthorized", "details" => "Invalid credentials supplied"));
-				throw new Exception(json_encode(array("error" => "401 Unauthorized", "details" => "Invalid credentials supplied")));
+				$this->responseCode = 401;
+				return (json_encode(array("error" => "401 Unauthorized", "details" => "Invalid credentials supplied")));
 			}
 		}
 
@@ -58,7 +60,7 @@
 				'verb'     => $this->verb,
 				'args'     => $this->args,
 				'file'     => $this->file,
-				'request'  => $this->reques,
+				'request'  => $this->request,
 				'user'     => isset($_SERVER['PHP_AUTH_USER']) ? $_SERVER['PHP_AUTH_USER'] : 'No user provided',
 				'password' => isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : 'No password provided'
 			));
@@ -71,7 +73,7 @@
 			require_once("$dirname/../lib/cookies.php");
 			require_once("$dirname/../lib/sessions.php");
 	
-			// Login
+			/* Login
 			if($this->verb == "login" && $this->method == 'PUT')
 			{
 				$PUTArray = json_decode($this->file, true);
@@ -96,7 +98,7 @@
 			}
 
 			// Get all users
-			else if($this->verb == "" && $this->method == 'GET')
+			else */if($this->verb == "" && $this->method == 'GET')
 			{
 				// Check if we're logged in
 				if(userLoggedIn())
@@ -107,15 +109,18 @@
 					// Only admins can see all users
 					if($AUser->getIsAdmin())
 					{
+						$this->responseCode = 200;
 						return json_encode(array("result" => "200 OK", "details" => "User list retrieved"));
 					}
 					else
 					{
+						$this->responseCode = 403;
 						return json_encode(array("error" => "403 Forbidden","details" => "Admin rights required"));
 					}
 				}
 				else
 				{
+					$this->responseCode = 401;
 					return json_encode(array("error" => "401 Unauthorized","details" => "User not logged in"));
 				}
 			}

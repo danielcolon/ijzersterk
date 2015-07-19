@@ -31,6 +31,9 @@ abstract class API
      */
      protected $file = Null;
 
+     // Allow IJzersterkAPI to set the response code
+     protected $responseCode = 200;
+     
     /**
      * Constructor: __construct
      * Allow for CORS, assemble and pre-process the data
@@ -61,7 +64,7 @@ abstract class API
             }
             else
             {
-                throw new Exception("Unexpected Header");
+                $this->_response(json_encode(array("error" => "400 Bad Request","details" => "Unexpected header")), 400);
             }
         }
 
@@ -78,7 +81,7 @@ abstract class API
             $this->file = file_get_contents("php://input");
             break;
         default:
-            $this->_response('Invalid Method', 405);
+            $this->_response(json_encode(array("error" => "405 Method Not Allowed","details" => "Method Not Allowed")), 405);
             break;
         }
     }
@@ -87,9 +90,9 @@ abstract class API
      {
         if(method_exists($this, $this->endpoint))
         {
-            return $this->_response($this->{$this->endpoint}($this->args));
+            return $this->_response($this->{$this->endpoint}($this->args), $this->responseCode);
         }
-        return $this->_response("No Endpoint: $this->endpoint", 404);
+        return $this->_response(json_encode(array("error" => "404 Not Found","details" => "No Endpoint: $this->endpoint")), 404);
     }
 
     private function _response($data, $status = 200) {
@@ -112,6 +115,9 @@ abstract class API
     private function _requestStatus($code) {
         $status = array(  
             200 => 'OK',
+            400 => 'Bad Request',
+            401 => 'Unauthorized',
+            403 => 'Forbidden',
             404 => 'Not Found',   
             405 => 'Method Not Allowed',
             500 => 'Internal Server Error',
