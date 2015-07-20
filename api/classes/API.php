@@ -64,7 +64,7 @@ abstract class API
             }
             else
             {
-                $this->_response(json_encode(array("error" => "400 Bad Request","details" => "Unexpected header")), 400);
+                $this->_response(json_encode(array("status" => "400 Bad Request","details" => "Unexpected header")), 400);
             }
         }
 
@@ -81,7 +81,7 @@ abstract class API
             $this->file = file_get_contents("php://input");
             break;
         default:
-            $this->_response(json_encode(array("error" => "405 Method Not Allowed","details" => "Method Not Allowed")), 405);
+            $this->_response(json_encode(array("status" => "405 Method Not Allowed","details" => "Method Not Allowed")), 405);
             break;
         }
     }
@@ -92,7 +92,7 @@ abstract class API
         {
             return $this->_response($this->{$this->endpoint}($this->args), $this->responseCode);
         }
-        return $this->_response(json_encode(array("error" => "404 Not Found","details" => "No Endpoint: $this->endpoint")), 404);
+        return $this->_response(json_encode(array("status" => "404 Not Found","details" => "No Endpoint: $this->endpoint")), 404);
     }
 
     private function _response($data, $status = 200) {

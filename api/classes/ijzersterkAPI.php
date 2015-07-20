@@ -35,15 +35,15 @@
 			if(!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']))
 			{
 				$this->responseCode = 400;
-				return(json_encode(array("error" => "400 Bad Request","details" => "Username or password not provided")));
+				return json_encode(array("status" => "400 Bad Request","details" => "Username or password not provided"));
 			}
 
 			$this->currentUser = new user;
 			if(!$this->currentUser->login($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']))
 			{
-				//return json_encode(array("error" => "401 Unauthorized", "details" => "Invalid credentials supplied"));
+				//return json_encode(array("status" => "401 Unauthorized", "details" => "Invalid credentials supplied"));
 				$this->responseCode = 401;
-				return(json_encode(array("error" => "401 Unauthorized", "details" => "Invalid credentials supplied")));
+				return json_encode(array("status" => "401 Unauthorized", "details" => "Invalid credentials supplied"));
 			}
 
 			// Thén do the actual processing
@@ -53,7 +53,8 @@
 		// Show sender what he sent for debugging
 		protected function requestinfo()
 		{
-			return json_encode(array(
+			$this->responseCode = 200;
+			$result = array(
 				'method'   => $this->method,
 				'endpoint' => $this->endpoint,
 				'verb'     => $this->verb,
@@ -62,24 +63,10 @@
 				'request'  => $this->request,
 				'user'     => isset($_SERVER['PHP_AUTH_USER']) ? $_SERVER['PHP_AUTH_USER'] : 'No user provided',
 				'password' => isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : 'No password provided'
-			));
+			);
+			return json_encode(array("status" => "200 OK","details" => "RequestInfo returned","result" => $result));
 		}
-		
-		protected function temp()
-		{
-			$dirname = dirname(__FILE__);
-			require_once("$dirname/user.php");
 
-			// Create a user
-			$AUser = new user;
-			$AUser->setUsername("dcolon");
-			$AUser->fill();
-			$AUser->setPassword(password_hash("testpass", PASSWORD_DEFAULT));
-			trigger_error("Password set to: " . $AUser->getPassword(), E_USER_NOTICE);
-			$AUser->addToDatabase();
-			return "succes";
-		}
-		
 		protected function user()
 		{
 			$dirname = dirname(__FILE__);
@@ -97,16 +84,16 @@
 					if($AUsers->fill())
 					{
 						$this->responseCode = 200;
-						return json_encode(array("result" => "200 OK", "users" => $AUsers->getAsArray()));
+						return json_encode(array("status" => "200 OK", "result" => $AUsers->getAsArray()));
 					}
 					else
 					{
 						$this->responseCode = 500;
-						return json_encode(array("error" => "500 Internal Server Error","details" => "Couldn't load users"));
+						return json_encode(array("status" => "500 Internal Server Error","details" => "Couldn't load users"));
 					}
 				}
 				$this->responseCode = 403;
-				return json_encode(array("error" => "403 Forbidden","details" => "Admin rights required"));
+				return json_encode(array("status" => "403 Forbidden","details" => "Admin rights required"));
 			}
 			else if($this->method == 'GET')
 			{
@@ -117,7 +104,7 @@
 					if($this->verb == $this->currentUser->getUsername())
 					{
 						$this->responseCode = 200;
-						return json_encode(array("result" => "200 OK", "user" => $this->currentUser->getAsAssociativeArray()));
+						return json_encode(array("status" => "200 OK", "result" => $this->currentUser->getAsAssociativeArray()));
 					}
 
 					// Try to fill for the given username
@@ -125,13 +112,18 @@
 					$Auser->setUsername($this->verb);
 					if($Auser->fill())
 					{
-						return json_encode(array("result" => "200 OK", "user" => $Auser->getAsAssociativeArray()));
+						return json_encode(array("status" => "200 OK", "result" => $Auser->getAsAssociativeArray()));
 					}
 					else
 					{
 						$this->responseCode = 404;
-						return json_encode(array("error" => "404 Not Found","details" => "Couldn't find user " . $this->verb));
+						return json_encode(array("status" => "404 Not Found","details" => "Couldn't find user " . $this->verb));
 					}
+				}
+				else
+				{
+					$this->responseCode = 403;
+					return json_encode(array("status" => "403 Forbidden","details" => "Admin rights required"));
 				}
 			}
 			else if($this->verb != "" && $this->method == 'PUT')
@@ -151,14 +143,14 @@
 					if(is_null($PUTArray))
 					{
 						$this->responseCode = 400;
-						return json_encode(array("error" => "400 Bad Request","details" => "Couldn't decode json input data"));
+						return json_encode(array("status" => "400 Bad Request","details" => "Couldn't decode json input data"));
 					}
 
 					if(!$AUser->fill() && !isset($PUTArray["password"]))
 					{
 						$this->responseCode = 400;
 						//If the user doesn't exist yet we need to make sure there's a new password in the data
-						return json_encode(array("error" => "400 Bad Request","details" => "No password provided for new user"));
+						return json_encode(array("status" => "400 Bad Request","details" => "No password provided for new user"));
 					}
 
 					// Remember if we're a new user
@@ -179,21 +171,17 @@
 
 					// The user object will handle whether we'll add a user or update a user depending on if
 					// it was found in the database or not
-					trigger_error("Before addtodb", E_USER_NOTICE);
 					if($AUser->addToDatabase())
 					{
-						trigger_error("After addtodb", E_USER_NOTICE);
 						if($isNew) 
 						{
-							trigger_error("Isnew", E_USER_NOTICE);
 							$this->responseCode = 201;
-							return json_encode(array("result" => "201 Created", "details" => "New user succesfully created"));
+							return json_encode(array("result" => "201 Created", "details" => "New user succesfully created","result" => $AUser->getAsAssociativeArray()));
 						}
 						else
 						{
-							trigger_error("IsNotnew", E_USER_NOTICE);
 							$this->responseCode = 200;
-							return json_encode(array("result" => "200 Ok", "details" => "User succesfully updated"));
+							return json_encode(array("result" => "200 Ok", "details" => "User succesfully updated","result" => $AUser->getAsAssociativeArray()));
 						}
 					}
 				}
@@ -201,7 +189,7 @@
 
 			// Apparantly somethign went wrong if we still haven't returned
 			$this->responseCode = 400;
-			return json_encode(array("error" => "400 Bad Request","details" => "Nothing was done"));
+			return json_encode(array("status" => "400 Bad Request","details" => "Nothing was done"));
 
 			/* Login (Might still want to use some of this when implementing OAuth)
 			if($this->verb == "login" && $this->method == 'PUT')
