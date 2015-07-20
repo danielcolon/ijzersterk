@@ -59,9 +59,9 @@
 				'endpoint' => $this->endpoint,
 				'verb'     => $this->verb,
 				'args'     => $this->args,
-				'file'     => $this->file,
+				'data'     => $this->file,
 				'request'  => $this->request,
-				'user'     => isset($_SERVER['PHP_AUTH_USER']) ? $_SERVER['PHP_AUTH_USER'] : 'No user provided',
+				'username'     => isset($_SERVER['PHP_AUTH_USER']) ? $_SERVER['PHP_AUTH_USER'] : 'No user provided',
 				'password' => isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : 'No password provided'
 			);
 			return json_encode(array("status" => "200 OK","details" => "RequestInfo returned","result" => $result));
@@ -84,7 +84,7 @@
 					if($AUsers->fill())
 					{
 						$this->responseCode = 200;
-						return json_encode(array("status" => "200 OK", "result" => $AUsers->getAsArray()));
+						return json_encode(array("status" => "200 OK", "details" => "List of users returned", "result" => $AUsers->getAsArray()));
 					}
 					else
 					{
@@ -104,7 +104,7 @@
 					if($this->verb == $this->currentUser->getUsername())
 					{
 						$this->responseCode = 200;
-						return json_encode(array("status" => "200 OK", "result" => $this->currentUser->getAsAssociativeArray()));
+						return json_encode(array("status" => "200 OK", "details" => "Current user returned", "result" => $this->currentUser->getAsAssociativeArray()));
 					}
 
 					// Try to fill for the given username
@@ -112,7 +112,7 @@
 					$Auser->setUsername($this->verb);
 					if($Auser->fill())
 					{
-						return json_encode(array("status" => "200 OK", "result" => $Auser->getAsAssociativeArray()));
+						return json_encode(array("status" => "200 OK", "details" => "User returned", "result" => $Auser->getAsAssociativeArray()));
 					}
 					else
 					{
@@ -164,9 +164,9 @@
 
 					// Now get the other stuff
 					$AUser->setUsername($this->verb);
-					if(isset($PUTArray["isadmin"]) && $this->currentUser->getIsAdmin()) $AUser->setIsAdmin($PUTArray["isadmin"]); // Only let admins set isadmin
-					if(isset($PUTArray["firstname"])) $AUser->setFirstName($PUTArray["firstname"]);
-					if(isset($PUTArray["lastname"])) $AUser->setLastName($PUTArray["lastname"]);
+					if(isset($PUTArray["isAdmin"]) && $this->currentUser->getIsAdmin()) $AUser->setIsAdmin($PUTArray["isAdmin"]); // Only let admins set isadmin
+					if(isset($PUTArray["firstName"])) $AUser->setFirstName($PUTArray["firstName"]);
+					if(isset($PUTArray["lastName"])) $AUser->setLastName($PUTArray["lastName"]);
 					if(isset($PUTArray["email"])) $AUser->setEmail($PUTArray["email"]);
 
 					// The user object will handle whether we'll add a user or update a user depending on if
@@ -176,12 +176,12 @@
 						if($isNew) 
 						{
 							$this->responseCode = 201;
-							return json_encode(array("result" => "201 Created", "details" => "New user succesfully created","result" => $AUser->getAsAssociativeArray()));
+							return json_encode(array("status" => "201 Created", "details" => "New user succesfully created","result" => $AUser->getAsAssociativeArray()));
 						}
 						else
 						{
 							$this->responseCode = 200;
-							return json_encode(array("result" => "200 Ok", "details" => "User succesfully updated","result" => $AUser->getAsAssociativeArray()));
+							return json_encode(array("status" => "200 Ok", "details" => "User succesfully updated","result" => $AUser->getAsAssociativeArray()));
 						}
 					}
 				}
