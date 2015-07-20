@@ -75,18 +75,20 @@
 
 			//Query
 			$this->QueryResult = $this->Connection->query($AQuery);
-			if (!$this->QueryResult)
+			if($this->QueryResult === false)
 			{
 				trigger_error("Query failed: "  . mysqli_error($this->Connection) . " with query $AQuery ", E_USER_WARNING);
 				return false;
 			}
-			else if($this->QueryResult->num_rows <= 0)
+			/*else if($this->QueryResult->num_rows <= 0)
 			{
 				trigger_error("Empty query result", E_USER_WARNING);
 				return false;
-			}
+			}*/
 			else
 			{
+				$this->num_rows = gettype($this->QueryResult) == 'object' ? $this->QueryResult->num_rows : 0;
+
 				return true;
 			}
 		}

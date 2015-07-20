@@ -173,23 +173,27 @@
 					// Now get the other stuff
 					$AUser->setUsername($this->verb);
 					if(isset($PUTArray["isadmin"]) && $this->currentUser->getIsAdmin()) $AUser->setIsAdmin($PUTArray["isadmin"]); // Only let admins set isadmin
-					if(isset($PUTArray["firstname"])) $AUser->setUsername($PUTArray["firstname"]);
-					if(isset($PUTArray["lastname"])) $AUser->setUsername($PUTArray["lastname"]);
-					if(isset($PUTArray["email"])) $AUser->setUsername($PUTArray["email"]);
+					if(isset($PUTArray["firstname"])) $AUser->setFirstName($PUTArray["firstname"]);
+					if(isset($PUTArray["lastname"])) $AUser->setLastName($PUTArray["lastname"]);
+					if(isset($PUTArray["email"])) $AUser->setEmail($PUTArray["email"]);
 
 					// The user object will handle whether we'll add a user or update a user depending on if
 					// it was found in the database or not
+					trigger_error("Before addtodb", E_USER_NOTICE);
 					if($AUser->addToDatabase())
 					{
+						trigger_error("After addtodb", E_USER_NOTICE);
 						if($isNew) 
 						{
+							trigger_error("Isnew", E_USER_NOTICE);
 							$this->responseCode = 201;
 							return json_encode(array("result" => "201 Created", "details" => "New user succesfully created"));
 						}
 						else
 						{
+							trigger_error("IsNotnew", E_USER_NOTICE);
 							$this->responseCode = 200;
-							return json_encode(array("result" => "200 Ok", "details" => "User succesfully"));
+							return json_encode(array("result" => "200 Ok", "details" => "User succesfully updated"));
 						}
 					}
 				}

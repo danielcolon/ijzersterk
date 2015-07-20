@@ -175,7 +175,6 @@ class user
 	function setPassword($APassword)
 	{
 		$this->password = $APassword;
-		trigger_error("Password set to: " . $this->password, E_USER_NOTICE);
 		$this->isChanged = TRUE;
 	}
 
@@ -356,7 +355,7 @@ class user
 			{
 				$query = "SELECT * FROM users WHERE username = '" . $this->getUsername() . "';";
 			}
-			if($ADatabase->query($query))
+			if($ADatabase->query($query) && $ADatabase->num_rows > 0)
 			{
 				//Load user data
 				$row = $ADatabase->QueryResult->fetch_assoc();
@@ -447,6 +446,7 @@ class user
 		$SQL = trim(preg_replace('/\n+/', '',preg_replace('/\t+/', '', $SQL)));
 		if($Database->query($SQL))
 		{
+			trigger_error("Query succes", E_USER_NOTICE);
 			$this->setInDatabase(true);
 
 			//Verbreek verbinding
