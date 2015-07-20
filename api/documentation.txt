@@ -1,0 +1,161 @@
+Url
+	http://api.ijzersterkdelft.nl
+
+Protocols
+	http/1.1
+	json
+
+Authentication
+	http1.1, username and password in header for every request
+
+Methods
+	GET
+		Gets object from server
+	PUT
+		Updates object on server if it exists
+		Adds it if it doesn't
+	POST
+		Adds object on server whether it
+		exists or not.
+	DELETE
+		Deletes object from server if it
+		exists.
+
+Response
+	The server will reply with an http/1.1 response code in the header compliant with rfc2616:
+	http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+	All possible response codes are:
+		200 OK
+		201 Created
+		400 Bad Request
+		401 Unauthorized
+		403 Forbidden
+		404 Not Found
+		405 Method Not Allowed
+		500 Internal Server Error
+
+	Possible response codes and details are provided for every endpoint and method
+	General results are: (<status code> - <details> - <description>)
+		400 Bad Request - Unexpected header                  - Something is fucky with your headers
+		405 Method Not Allowed - Method Not Allowed          - API only supports GET, PUT, POST, DELETE
+		404 Not Found    - No Endpoint: <endpoint>           - The endpoint couldn't be found
+		400 Bad Request  - Username or password not provided
+		401 Unauthorized - Invalid credentials supplied
+
+	Response data is stringified json
+	Response data will always be of the format:
+	{
+		"status" :"<response code and description>",
+		"details":"<More detailed description of response>",
+		"result":
+		{/[
+			<returned object or array as described in Resources>
+		}/]
+	}
+
+	Examples:
+		GET api.ijzersterkdelft.nl/user/testadmin
+		"{\"status\":\"200 OK\",\"result\":{\"id\":\"4\",\"username\":\"testadmin\",\"lastLogin\":null,\"lastLoginIP\":\"0\",\"created\":\"2015-07-20 13:19:20\",\"isAdmin\":\"1\",\"firstName\":\"Test\",\"lastName\":\"Admin\",\"email\":\"\"}}"
+		PUT -d "{\"firstname\":\"Test\",\"lastname\":\"User\"}" api.ijzersterkdelft.nl/user/testuser
+		"{\"status\":\"200 Ok\",\"details\":\"User succesfully updated\",\"result\":{\"id\":\"3\",\"username\":\"testuser\",\"lastLogin\":null,\"lastLoginIP\":\"0\",\"created\":\"2015-07-19 18:27:06\",\"isAdmin\":\"0\",\"firstName\":\"Test\",\"lastName\":\"User\",\"email\":\"\"}}"
+
+Resource Documentation Format
+	<endpoint>
+		<method>
+		DATA - Expected data
+			<data format> either an object '{}' or array '[]'
+				<datatype> <fieldname> - <description>
+			<data format>
+		RESULT - result (excluding status and details)
+			<result format> either an object '{}' or array '[]'
+				<datatype> <fieldname> - <description>
+			<result format>
+		STATUS - possible response statusses
+			<status code> - <details> - <description>
+
+	'()' represents required privileges for operation
+	'>>' represents a reference to other part of the documentation.
+	     for instance: succesful user PUT responds with a user in the same format as user/<username> GET
+
+Resources
+	/user
+		GET (admin)
+			RESULT
+			[
+				string username - list of usernames
+			]
+			STATUS
+				200 OK                    - List of users returned
+				500 Internal Server Error - Couldn't load users    - Something went wrong on the server check apache logs
+				403 Forbidden             - Admin rights required
+
+	/user/<username>
+		GET (user <username>)(admin)
+			RESULT
+			{
+				int      id
+				string   username
+				DateTime lastLogin   NOT IMPLEMENTED
+				string   lastLoginIP NOT IMPLEMENTED
+				DateTime created
+				bool     isAdmin
+				string   firstName
+				string   lastName
+				string   email
+			}
+			STATUS
+				200 OK        - Current user returned
+				200 OK        - User returned
+				404 Not Found - Couldn't find user <username>
+				403 Forbidden - Admin rights required - Only admins can get other users
+
+		PUT (user <username>)(admin)
+			DATA
+			{
+				bool   isAdmin (admin, otherwise ignored)
+				string firstName
+				string lastName
+				string email
+				string password - required for new user
+			}
+			RESULT
+				>>/user/<username> GET
+			STATUS
+				200 OK          - User succesfully updated
+				201 Created     - New user succesfully created
+				400 Bad Request - Nothing was done - The server didn't see a function fitting for your endpoint, data and method
+				400 Bad Request - No password provided for new user
+				400 Bad Request - Couldn't decode json input data - Couldn't decode data with PHP json_decode
+
+	requestinfo
+		A special function that will respond with the data sent to the server for the purpose of debugging
+		RESULT
+				string method   - method like POST, GET etc.
+				string endpoint
+				string verb     - e.g. <username>
+				string args     - arguments in post. Not used
+				string data     - data sent
+				string request  - e.g. requestinfo
+				string username - username from header
+				string password - password from header
+			);
+
+NOT IMPLEMENTED
+	/page
+		GET
+			RESULT
+			[
+				string title - list of page titles
+			]
+
+	/page/<title>
+		GET
+			RESULT
+			{
+				string content  - Html formatted
+								page content
+				string language - Language code
+								i.e. nl or en
+			}
+			PUT, DELETE
+
