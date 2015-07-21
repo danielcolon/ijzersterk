@@ -8,6 +8,7 @@ body{
 
 a{
 	color: #999;
+	text-decoration: underline;
 }
 
 a:hover{
@@ -35,7 +36,9 @@ h1{
 	text-transform: uppercase;
 	font-weight: bold;
 	font-size: 14pt;
-	text-shadow: 1px 1px 1px rgba(30, 30, 30, 1);
+	text-shadow: 1px 1px 1px rgba(10, 10, 10, 0.5);
+	text-decoration: none;
+
 }
 .navbar-inverse .navbar-nav .active>a, .navbar-inverse .navbar-nav .active>a:hover{
 	background-color: transparent;
@@ -52,6 +55,10 @@ h1{
 	height: 200px;
 	width: 300px;
 	margin: -70px auto 10px auto;
+}
+
+.navbar .container .logo:hover{
+	background-image: url("img/logorood.svg");
 }
 
 .main {
