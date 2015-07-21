@@ -1,0 +1,20 @@
+body{
+	font-family: Verdana, Geneva, sans-serif;
+	font-size:16px;
+	color:#222;
+	font-weight:300;
+	line-height: 1.625;
+}
+
+a{
+	color: #999;
+	text-decoration: underline;
+}
+
+a:hover{
+	color: #B82605;
+}
+
+h1{
+	font-weight: 700;
+}
