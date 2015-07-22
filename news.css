@@ -1,6 +1,11 @@
 h1{
 	margin-top: 10px;
 }
+
+.article:first-child{
+	margin-top: 40px;
+}
+
 .article:not(:last-child) {
 	margin-bottom: 40px;
 	border-bottom: 1px solid #ccc;
