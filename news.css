@@ -1,12 +1,15 @@
 h1{
 	margin-top: 10px;
 }
-
+.article h4{
+	margin-bottom: 0;
+}
 .article:first-child{
 	margin-top: 40px;
 }
 
 .article:not(:last-child) {
+	padding-bottom: 10px;
 	margin-bottom: 40px;
 	border-bottom: 1px solid #ccc;
 }
