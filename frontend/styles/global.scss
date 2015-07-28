@@ -1,0 +1,46 @@
+@import "bootstrap";
+
+@import "variables.scss";
+
+h1,h2,h3,h4{
+	color: $header-color;
+}
+
+h1{
+	font-weight: 700;
+}
+
+body{
+	font-family: Verdana, Geneva, sans-serif;
+	font-size:16px;
+	color:$font-color;
+	font-weight:300;
+	line-height: 1.625;
+}
+
+a{
+	color: #999;
+	text-decoration: underline;
+	&:visited{
+		color: #337ab7;
+	}
+	&:hover{
+		color: $red;
+	}
+}
+
+.emp-red{
+	color: $red;
+	font-weight: 700;
+}
+
+.img-desc{
+	font-size:16px;
+}
+
+.subheader{
+	color: $header-color;
+	font-size: 24px;
+	font-weight: 700;
+	margin-bottom: 0;
+}
