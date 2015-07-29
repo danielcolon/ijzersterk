@@ -1,12 +1,12 @@
-@import "variables.scss";
+@import "variables.less";
 
 .navbar {
 	border-radius: 0px;
-	border-bottom: 5px solid $red;
+	border-bottom: 5px solid @red;
 	background-image: url("../img/banner.jpg");
 	background-size: cover;
 	background-position: center;
-	
+
 	.container{
 		padding-top: 30px;
 
@@ -38,6 +38,6 @@
 		background-color: transparent;
 	}
 	li>a:hover, .active li>a:hover{
-		color: $red;
+		color: @red;
 	}
 }

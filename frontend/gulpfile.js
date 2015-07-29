@@ -1,12 +1,9 @@
 'use strict';
 
 var gulp = require('gulp');
-
+var less = require('gulp-less');
 // Only passes the files which are changed
 var changed = require('gulp-changed');
-
-// To compile sass to css
-var sass = require('gulp-sass');
 
 // Adds the vendor prefixes (like -webkit -moz etc) into the css
 var autoprefixer = require('autoprefixer-core');
@@ -47,16 +44,18 @@ var htmlReplace = require('gulp-html-replace');
 // Optimize PNG, JPG, GIF, SVG images
 var image = require('gulp-image');
 
+var csso = require('gulp-csso');
+
 var reload = browserSync.reload;
 var config = {
     jsx: './scripts/app.jsx',
-    scss: 'styles/**/*.scss',
+    less: 'styles/**/*.less',
     bundle: 'app.js',
     distJs: 'dist/js',
     distCss: 'dist/css',
     distHtml: 'dist',
     distImg: 'dist/img',
-    bowerDir: './bower_components'
+    npmDir: './node_modules'
 };
 
 // Same as rm -rf dist
@@ -70,7 +69,8 @@ gulp.task('browserSync', function() {
     browserSync({
         server: {
             baseDir: './'
-        }
+        },
+        open: false
     });
 });
 
@@ -107,14 +107,14 @@ gulp.task('browserify', function() {
 
 // Parses and process the style files (from scss to css)
 gulp.task('styles', function() {
-    return gulp.src(config.scss)
+    return gulp.src(config.less)
         .pipe(changed(config.distCss))
-        .pipe(sass({
-            errLogToConsole: true,
-            includePaths: [config.bowerDir + '/bootstrap-sass-official/assets/stylesheets']
+        .pipe(less({
+            paths: [config.npmDir + '/bootstrap/less/']
         }))
         .on('error', notify.onError())
         .pipe(postcss([autoprefixer('last 1 version')]))
+        .pipe(csso())
         .pipe(gulp.dest(config.distCss))
         .pipe(reload({
             stream: true

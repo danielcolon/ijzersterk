@@ -1,9 +1,9 @@
 @import "bootstrap";
 
-@import "variables.scss";
+@import "variables.less";
 
 h1,h2,h3,h4{
-	color: $header-color;
+	color: @header-color;
 }
 
 h1{
@@ -13,7 +13,7 @@ h1{
 body{
 	font-family: Verdana, Geneva, sans-serif;
 	font-size:16px;
-	color:$font-color;
+	color:@font-color;
 	font-weight:300;
 	line-height: 1.625;
 }
@@ -25,12 +25,12 @@ a{
 		color: #337ab7;
 	}
 	&:hover{
-		color: $red;
+		color: @red;
 	}
 }
 
 .emp-red{
-	color: $red;
+	color: @red;
 	font-weight: 700;
 }
 
@@ -39,7 +39,7 @@ a{
 }
 
 .subheader{
-	color: $header-color;
+	color: @header-color;
 	font-size: 24px;
 	font-weight: 700;
 	margin-bottom: 0;
