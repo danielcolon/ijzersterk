@@ -146,7 +146,7 @@ gulp.task('lint', function() {
 });
 
 gulp.task('watchTask', function() {
-    gulp.watch(config.scss, ['styles']);
+    gulp.watch(config.less, ['styles']);
     gulp.watch('scripts/**/*.jsx', ['lint']);
 });
 
