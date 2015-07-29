@@ -1,6 +1,5 @@
 import React from 'react';
-import TodoManager from './components/TodoManager.jsx';
-
+import Login from './components/Login.jsx';
 window.React = React;
 
-//React.render(<TodoManager/>, document.getElementById('content'));
+React.render(<Login/>, document.getElementById('content'));
