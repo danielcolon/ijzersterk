@@ -1,7 +1,7 @@
 # Installation
 Required: `nodejs`, `npm`  
-Install globally: `npm install -g gulp bower`  
-Install all the necessary dependencies with `npm install && bower install`  
+Install globally: `npm install -g gulp`  
+Install all the necessary dependencies with `npm install`  
 
 # Gulp
 [Gulp](http://gulpjs.com/) is a build system. 
