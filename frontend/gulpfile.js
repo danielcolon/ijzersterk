@@ -1,7 +1,13 @@
 'use strict';
 
 var gulp = require('gulp');
+
+// Concats css files into one file css
+var concatCss = require('gulp-concat-css');
+
+// Parses less files to css files
 var less = require('gulp-less');
+
 // Only passes the files which are changed
 var changed = require('gulp-changed');
 
@@ -114,6 +120,7 @@ gulp.task('styles', function() {
         }))
         .on('error', notify.onError())
         .pipe(postcss([autoprefixer('last 1 version')]))
+        .pipe(concatCss('main.css'))
         .pipe(csso())
         .pipe(gulp.dest(config.distCss))
         .pipe(reload({
