@@ -45,6 +45,7 @@
     "moment": "^2.10.6",
     "react": "^0.13.3",
     "react-bootstrap": "^0.24.3",
+    "react-router": "^0.13.3",
     "react-tools": "^0.13.3",
     "superagent": "^1.2.0",
     "vinyl-buffer": "^1.0.0",
