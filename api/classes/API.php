@@ -40,9 +40,28 @@ abstract class API
      */
     public function __construct($request)
     {
-        header("Access-Control-Allow-Orgin: *");
-        header("Access-Control-Allow-Methods: *");
+        //header("Access-Control-Allow-Orgin: *");
+        //header("Access-Control-Allow-Methods: *");
         header("Content-Type: application/json");
+        
+        // Proper CORS
+        // Allow from any origin
+		if (isset($_SERVER['HTTP_ORIGIN'])) {
+			header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+			header('Access-Control-Allow-Credentials: true');
+			header('Access-Control-Max-Age: 86400');    // cache for 1 day
+		}
+
+		// Access-Control headers are received during OPTIONS requests
+		if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+
+			if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
+				header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");         
+
+			if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
+				header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+			exit(0);
+		}
 
         $this->args = explode('/', rtrim($request, '/'));
         $this->endpoint = array_shift($this->args);
@@ -80,6 +99,8 @@ abstract class API
             $this->request = $this->_cleanInputs($_GET);
             $this->file = file_get_contents("php://input");
             break;
+		//case 'OPTIONS':
+		//	$this->_response(json_encode(array("status" => "200 OK","details" => "OPTIONS")), 200);
         default:
             $this->_response(json_encode(array("status" => "405 Method Not Allowed","details" => "Method Not Allowed")), 405);
             break;
