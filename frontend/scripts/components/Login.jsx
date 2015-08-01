@@ -6,18 +6,21 @@ default React.createClass({
     handleSubmit(event) {
         event.preventDefault();
         var credentials = {
-            username: React.findDOMNode(this.refs.username),
-            password: React.findDOMNode(this.refs.password)
+            username: React.findDOMNode(this.refs.username).value,
+            password: React.findDOMNode(this.refs.password).value
         };
         $.ajax({
-            type: 'PUT',
-            url: 'http://api.ijzersterkdelft.nl/user/login',
+            type: 'GET',
+            url: 'http://api.ijzersterkdelft.nl/user',
             contentType: 'application/json',
             dataType: 'json',
-            data: JSON.stringify(credentials),
             beforeSend: function(xhr) {
                 xhr.overrideMimeType('text/plain; charset=x-user-defined');
+                xhr.setRequestHeader('Authorization',
+                    'Basic ' + btoa(credentials.username + ':' + credentials.password));
             }
+        }).success(function(){
+            // TODO do something with the data received
         });
     },
     render() {
