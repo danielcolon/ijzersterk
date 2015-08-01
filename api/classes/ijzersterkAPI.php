@@ -16,10 +16,12 @@
 		{
 			// We'll allow anyone to access certain functions
 			$publicFunctions = array(
-			'requestinfo',
-			'temp'
+				'requestinfo'
 			);
-			if(in_array($this->endpoint, $publicFunctions))
+			$publicVerbs = array(
+				'verify'
+			);
+			if(in_array($this->endpoint, $publicFunctions) || in_array($this->verb, $publicVerbs))
 			{
 				return parent::processAPI();
 			}
@@ -125,6 +127,23 @@
 					$this->responseCode = 403;
 					return json_encode(array("status" => "403 Forbidden","details" => "Admin rights required"));
 				}
+			}
+			else if($this->verb == "verify" && $this->method == 'POST')
+			{
+				// This is a public function to check username and password
+				// Always respond 200
+				$this->responseCode = 401;
+
+				$this->currentUser = new user;
+				if(!$this->currentUser->login($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']))
+				{
+					$result = array("isOk" => TRUE);
+				}
+				else
+				{
+					$result = array("isOk" => FALSE);
+				}
+				return json_encode(array("status" => "200 OK", "details" => "User verified", "result" => $result));
 			}
 			else if($this->verb != "" && $this->method == 'PUT')
 			{
