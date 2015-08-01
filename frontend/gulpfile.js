@@ -111,8 +111,23 @@ gulp.task('browserify', function() {
         .pipe(gulp.dest(config.distJs));
 });
 
-// Parses and process the style files (from scss to css)
+// Parses and process the style files (from less to css)
 gulp.task('styles', function() {
+    return gulp.src(config.less)
+        .pipe(changed(config.distCss))
+        .pipe(less({
+            paths: [config.npmDir + '/bootstrap/less/']
+        }))
+        .on('error', notify.onError())
+        .pipe(postcss([autoprefixer('last 1 version')]))
+        .pipe(csso())
+        .pipe(gulp.dest(config.distCss))
+        .pipe(reload({
+            stream: true
+        }));
+});
+
+gulp.task('build-styles', function(){
     return gulp.src(config.less)
         .pipe(changed(config.distCss))
         .pipe(less({
@@ -122,10 +137,7 @@ gulp.task('styles', function() {
         .pipe(postcss([autoprefixer('last 1 version')]))
         .pipe(concatCss('main.css'))
         .pipe(csso())
-        .pipe(gulp.dest(config.distCss))
-        .pipe(reload({
-            stream: true
-        }));
+        .pipe(gulp.dest(config.distCss));
 });
 
 gulp.task('html-replace', function() {
@@ -163,7 +175,7 @@ gulp.task('watch', ['clean'], function() {
 
 gulp.task('build', ['clean'], function() {
     process.env.NODE_ENV = 'production';
-    gulp.start(['browserify', 'styles', 'html-replace', 'image']);
+    gulp.start(['browserify', 'build-styles','html-replace', 'image']);
 });
 
 gulp.task('default', function() {
