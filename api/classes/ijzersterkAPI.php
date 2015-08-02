@@ -132,6 +132,17 @@
 				break;
 				// Any verb that's not empty or verify means we'll have to look for a user with that name
 				default:
+					// Clean up input first.
+					// First set up database connection
+					$ADatabase = new TDatabase;
+					if(!$ADatabase->Connect())
+					{
+						$this->responseCode = 500;
+						return json_encode(array("status" => "500 Internal Server Error","details" => "Couldn't connect to database"));
+					}
+					$this->verb = $ADatabase->clean($this->verb);
+					$ADatabase->disconnect();
+
 					switch($this->method){
 						case 'GET':
 							// Only let admins or the user themselves see the user
@@ -219,6 +230,11 @@
 										return json_encode(array("status" => "200 Ok", "details" => "User succesfully updated","result" => $AUser->getAsAssociativeArray()));
 									}
 								}
+							}
+							else
+							{
+								$this->responseCode = 403;
+								return json_encode(array("status" => "403 Forbidden","details" => "Only administrators can edit users other than themselves."));
 							}
 						break;
 						default:
