@@ -132,16 +132,16 @@
 			{
 				// This is a public function to check username and password
 				// Always respond 200
-				$this->responseCode = 401;
+				$this->responseCode = 200;
 
 				$this->currentUser = new user;
 				if(!$this->currentUser->login($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']))
 				{
-					$result = array("isOk" => TRUE);
+					$result = array("isOk" => FALSE);
 				}
 				else
 				{
-					$result = array("isOk" => FALSE);
+					$result = array("isOk" => TRUE);
 				}
 				return json_encode(array("status" => "200 OK", "details" => "User verified", "result" => $result));
 			}
