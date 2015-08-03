@@ -74,7 +74,7 @@ gulp.task('clean', function(cb) {
 gulp.task('browserSync', function() {
     browserSync({
         server: {
-            baseDir: './'
+            baseDir: './dist/'
         },
         open: false
     });
@@ -120,7 +120,6 @@ gulp.task('styles', function() {
         }))
         .on('error', notify.onError())
         .pipe(postcss([autoprefixer('last 1 version')]))
-        .pipe(csso())
         .pipe(gulp.dest(config.distCss))
         .pipe(reload({
             stream: true
@@ -138,6 +137,14 @@ gulp.task('build-styles', function(){
         .pipe(concatCss('main.css'))
         .pipe(csso())
         .pipe(gulp.dest(config.distCss));
+});
+
+gulp.task('html-copy', function(){
+    return gulp.src('index.html')
+        .pipe(gulp.dest(config.distHtml))
+        .pipe(reload({
+            stream: true
+        }));
 });
 
 gulp.task('html-replace', function() {
@@ -165,12 +172,13 @@ gulp.task('lint', function() {
 });
 
 gulp.task('watchTask', function() {
+    gulp.watch('index.html', ['html-copy']);
     gulp.watch(config.less, ['styles']);
     gulp.watch('scripts/**/*.jsx', ['lint']);
 });
 
 gulp.task('watch', ['clean'], function() {
-    gulp.start(['browserSync', 'watchTask', 'watchify', 'styles', 'lint', 'image']);
+    gulp.start(['browserSync', 'watchTask', 'watchify', 'html-copy', 'styles', 'lint', 'image']);
 });
 
 gulp.task('build', ['clean'], function() {

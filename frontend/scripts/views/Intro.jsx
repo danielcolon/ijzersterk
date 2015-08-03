@@ -1,4 +1,5 @@
 import React from 'react';
+import {Link} from 'react-router';
 
 export
 default React.createClass({
@@ -13,9 +14,8 @@ default React.createClass({
                     <p>
                         <span className="emp-red">Strong together</span>, that is our motto. We lift together, we yell at each other and we motivate each other to achieve that summer body physique, or to achieve that personal record on the squat or just to become healthy.
                     </p>
-                    <p>At DSKV IJzersterk you can find other people who are interested in eating and becoming healthy, powerlifting, olympic lifting and strongman. People whom you can ask for guidance or just to train with. Interested? Look at the <a href="newmember.html">new member</a> page to find out how you can join!
+                    <p>At DSKV IJzersterk you can find other people who are interested in eating and becoming healthy, powerlifting, olympic lifting and strongman. People whom you can ask for guidance or just to train with. Interested? Look at the <Link to="newmember">new member</Link> page to find out how you can join!
                     </p>
                 </div>);
-
     }
 });
