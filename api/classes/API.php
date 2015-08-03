@@ -102,6 +102,7 @@ abstract class API
 		//case 'OPTIONS':
 		//	$this->_response(json_encode(array("status" => "200 OK","details" => "OPTIONS")), 200);
         default:
+			$this->responseCode = 405;
             $this->_response(json_encode(array("status" => "405 Method Not Allowed","details" => "Method Not Allowed")), 405);
             break;
         }

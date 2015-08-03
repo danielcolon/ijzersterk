@@ -490,7 +490,6 @@ class users
 		{
 			while($row = mysqli_fetch_assoc($ADatabase->QueryResult))
 			{
-				trigger_error('while', E_USER_NOTICE);
 				array_push($this->users, $row['username']);
 			}
 
