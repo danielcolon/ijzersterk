@@ -7,7 +7,7 @@ from 'react-router';
 export
 default React.createClass({
     render() {
-        return (<div className="col-md-3 sidebar">
+        return (<div className="col-md-3 col-xs-12 sidebar">
             <div className="block">
                 <h4>News</h4>
                 <ul>

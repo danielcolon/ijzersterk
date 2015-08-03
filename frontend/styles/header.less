@@ -1,28 +1,28 @@
-@import "variables.less";
-
 .navbar {
-	border-radius: 0px;
-	border-bottom: 5px solid @red;
-	background-image: url("../img/banner.jpg");
-	background-size: cover;
-	background-position: center;
-
-	.container{
-		padding-top: 30px;
-
-	}
-
-	.container .logo{
-		background-image: url("../img/logowit.svg");
-		background-size: contain;
-		background-repeat: no-repeat;
-		height: 200px;
-		width: 300px;
-		margin: -70px auto 10px auto;
-		&:hover{
-			background-image: url("../img/logorood.svg");
-		}
-	}
+    border-radius: 0px;
+    border-bottom: 5px solid @red;
+    @media (min-width: 769px){
+        .navbar-brand{
+            display: none !important;
+        }
+    	background-image: url("../img/banner.jpg");
+    	background-size: cover;
+    	background-position: center;
+    	.container{
+    		padding-top: 30px;
+            .logo{
+                background-image: url("../img/logowit.svg");
+                background-size: contain;
+                background-repeat: no-repeat;
+                height: 200px;
+                width: 300px;
+                margin: -70px auto 10px auto;
+                &:hover{
+                    background-image: url("../img/logorood.svg");
+                }
+            }
+    	}
+    }
 }
 
 .navbar-inverse .navbar-nav{
@@ -37,7 +37,21 @@
 	.active > a, .active > a:hover{
 		background-color: transparent;
 	}
-	li>a:hover, .active li>a:hover, a.active{
+	li>a:hover{
 		color: @red;
 	}
+    li > a:focus {
+        color: #ffffff;
+        border: 1px solid grey;
+    }
+}
+.navbar-inverse .navbar-nav > .active > a:focus{
+    background: none;
+    border: none !important;
+}
+.navbar .nav > .active > a {
+    text-decoration: underline;
+    &:hover{
+        color: @red;
+    }
 }

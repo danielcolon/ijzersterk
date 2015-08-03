@@ -4,17 +4,21 @@ export
 default React.createClass({
     render() {
         return (
-            <div className="col-md-10 col-md-offset-1">
+            <div className="col-md-10 col-md-offset-1 col-xs-12">
                 <div id="website-live" className="article">
                     <h1>New website is live!</h1>
                     <div className="date">July 22, 2015 | <span className="name">Pouja</span></div>
                     <p>Our new website with the new logo is live. We worked hard together with <a href="http://www.zokodesign.com">Zoko</a> to set up the new lay out of the website. Zoko also made the new logos:</p>
                     <div className="row">
-                        <div className="col-md-5">
-                            <img className="grey-bg" src="img/logorood.svg"/>
+                        <div className="col-md-5 col-xs-12">
+                            <div className="thumbnail">
+                                <img className="grey-bg" src="img/logorood.svg"/>
+                            </div>
                         </div>
-                        <div className="col-md-5 col-md-offset-1">
-                            <img className="grey-bg" src="img/logowit.svg"/>
+                        <div className="col-md-5 col-md-offset-1 col-xs-12">
+                            <div className="thumbnail">
+                                <img className="grey-bg" src="img/logowit.svg"/>
+                            </div>
                         </div>
                     </div>
                     <p>All the news, blogs and latest changes will be posted on the website from now on. So make sure to follow the website. We will still send the newsletters, which will also be posted on the news page.</p>
@@ -36,26 +40,26 @@ default React.createClass({
                     <p>The website is already hosting a wiki about Strength Sports and all it's aspects, we want to expand this to a big knowledge base, supervised by our club. The goal of the wiki is to have easy access to useful knowledge in an easy, straight forward format for beginners, intermediates and advanced lifters. Check out our wiki at: wiki.ijzersterkdelft.nl.</p>
                     <h4>Some pictures of the 'Sterkste Student van Delft'</h4>
                     <div className="row">
-                        <div className="col-md-4">
+                        <div className="col-md-4 col-xs-12">
                             <div className="thumbnail">
                                 <img src="http://www.ijzersterkdelft.nl/images/150322/20150322-163628.jpg"/>
-                                <div class="caption">
+                                <div className="caption">
                                     Arnela, the Strongest female student of Delft
                                 </div>
                             </div>
                         </div>
-                        <div className="col-md-4">
+                        <div className="col-md-4 col-xs-12">
                             <div className="thumbnail">
                                 <img src="http://www.ijzersterkdelft.nl/images/150322/20150322-163403.jpg"/>
-                                <div class="caption">
+                                <div className="caption">
                                     Auke, the Strongest male student of Delft
                                 </div>
                             </div>
                         </div>
-                        <div className="col-md-4">
+                        <div className="col-md-4 col-xs-12">
                             <div className="thumbnail">
                                 <img src="http://www.ijzersterkdelft.nl/images/150322/20150322-171822.jpg"/>
-                                <div class="caption">
+                                <div className="caption">
                                     The IJzersterk board at the award ceremony
                                 </div>
                             </div>
