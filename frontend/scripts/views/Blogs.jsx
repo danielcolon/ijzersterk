@@ -1,12 +1,13 @@
 import React from 'react';
 
-export default React.createClass({
-    render(){
-    return (
-        <div className="col-md-10 col-md-offset-1">
+export
+default React.createClass({
+    render() {
+        return (
+            <div className="col-md-10 col-md-offset-1">
           <div id="website-live" className="article">
-            <div className="date">July 22, 2015 | <span className="name">Pouja</span></div>
             <h1>New website is live!</h1>
+            <div className="date">July 22, 2015 | <span className="name">Pouja</span></div>
             <p>Our new website with the new logo are live. We worked hard together with <a href="http://www.zokodesign.com">Zoko</a> to set up the new lay out of the website. Zoko also made the new logos:</p>
             <div className="row">
               <div className="col-md-5">
@@ -20,8 +21,8 @@ export default React.createClass({
             <p>A new feature we are working on is the agenda system. In this system it will be possible with your credentials to see who is going to train when. It will also be possible to indicate that you want to train with someone. It will be an awesome feature!</p>
           </div>
           <div id="newsletter2" className="article">
-            <div className="date">June 10, 2015 | <span className="name">Ruud</span></div>
             <h1>News letter #2</h1>
+            <div className="date">June 10, 2015 | <span className="name">Ruud</span></div>
             <p>Dear krachtpatser/powerhouse,</p>
             <p>It has been a while since our last update, but we want you to know we're still active and lifting heavy weights! The 'Sterkste Student van Delft' was a great success, with 20 contestants! We are excited to organize it again next year.</p>
 
@@ -56,8 +57,8 @@ export default React.createClass({
             Board of DSKV IJzersterk</p>
           </div>
           <div id="sterkstestudent2015" className="article">
-            <div className="date">February 20, 2015 | <span className="name">Daniël</span></div>
             <h1>Sterkste Student(e) van Delft</h1>
+            <div className="date">February 20, 2015 | <span className="name">Daniël</span></div>
             <p>IJzersterk organises the powerlifting competition: 'De sterkste Student(e) van delft' (translated: The Strongest Student in Delft), which will take place on March 22 from 09:30 till 17:30 in hall 3 in the sport centre of the TU Delft.</p>
             <p>The competition is open for anyone, but be quick because there are limited slots available.</p>
             <p>It will be exciting and awesome day where you can show your strength and proof that you are the strongest student in Delft. The competition exists of three parts: the squat, the bench press and the deadlift in that order. Your score will be calculated by taking the total of the three lifts and multiplied by the wilks coefficient, which is based on your gender and body weight.</p>

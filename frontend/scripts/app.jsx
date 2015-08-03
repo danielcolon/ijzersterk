@@ -37,7 +37,6 @@ var routes = (
         <Route name="admin" handler={Login}/>
     </Route>
 );
-
 Router.run(routes, function(Handler){
-    React.render(<Handler/>, document.getElementById('content'));
+    React.render(<Handler/>, document.getElementById('react'));
 });

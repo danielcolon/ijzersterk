@@ -126,7 +126,7 @@ gulp.task('styles', function() {
         }));
 });
 
-gulp.task('build-styles', function(){
+gulp.task('build-styles', function() {
     return gulp.src(config.less)
         .pipe(changed(config.distCss))
         .pipe(less({
@@ -139,7 +139,7 @@ gulp.task('build-styles', function(){
         .pipe(gulp.dest(config.distCss));
 });
 
-gulp.task('html-copy', function(){
+gulp.task('html-copy', function() {
     return gulp.src('index.html')
         .pipe(gulp.dest(config.distHtml))
         .pipe(reload({
@@ -183,7 +183,7 @@ gulp.task('watch', ['clean'], function() {
 
 gulp.task('build', ['clean'], function() {
     process.env.NODE_ENV = 'production';
-    gulp.start(['browserify', 'build-styles','html-replace', 'image']);
+    gulp.start(['browserify', 'build-styles', 'html-replace', 'image']);
 });
 
 gulp.task('default', function() {

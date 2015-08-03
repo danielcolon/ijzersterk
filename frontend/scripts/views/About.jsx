@@ -3,7 +3,7 @@ import {Link} from 'react-router';
 
 export default React.createClass({
     render(){
-        return (<div className="col-md-9 col-md-offset-2">
+        return (<div className="col-md-10 col-md-offset-1">
           <h1>The association</h1>
           <div className="subheader">DSVK IJzersterk</div>
           <p>We, Daniël Colon, Ruud Kassing, Pouja Nikray and Daniël Schooneveld, started the association with the following points in mind:</p>
