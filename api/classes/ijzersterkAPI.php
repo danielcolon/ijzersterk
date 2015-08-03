@@ -17,6 +17,7 @@
 			// We'll allow anyone to access certain functions
 			$publicFunctions = array(
 				'requestinfo'
+				//'calendar' //Some of calendar is accessible to the public.
 			);
 			$publicVerbs = array(
 				'verify'
@@ -67,6 +68,65 @@
 				'password' => isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : 'No password provided'
 			);
 			return json_encode(array("status" => "200 OK","details" => "RequestInfo returned","result" => $result));
+		}
+
+		protected function calendar()
+		{
+			$dirname = dirname(__FILE__);
+			require_once("$dirname/calendar.php");
+			switch($this->method){
+				case 'GET':
+					switch($this->verb){
+						// Empty verb means user requested a list calendar events
+						case "":
+							// Unless and id was supplied as argument
+							if(isset($this->args[0]) && is_numeric($this->args[0]))
+							{
+								// Try to return the calendarEvent for the given id
+								// We don't have to clean input since it's just an int.
+								trigger_error(print_r($this->args[0], true), E_USER_NOTICE);
+								$ACalendarEvent = new calendarEvent;
+								$ACalendarEvent->setId($this->args[0]);
+								if($ACalendarEvent->fill())
+								{
+									$this->responseCode = 200;
+									return json_encode(array("status" => "200 OK","details" => "calendarEvent returned", "result" =>  $ACalendarEvent->getAsAssociativeArray()));
+								}
+								else
+								{
+									$this->responseCode = 404;
+									return json_encode(array("status" => "404 Not Found","details" => "Couldn't find calendarEvent " . $this->args[0]));
+								}
+							}
+							else
+							{
+								// If we have an empty verb and no args the user has requested a list of calendarEvents
+								$ACalendar = new calendar;
+								if($ACalendar->fill())
+								{
+									$this->responseCode = 200;
+									return json_encode(array("status" => "200 OK","details" => "calendar returned", "result" =>  $ACalendar->getAsAssociativeArray()));
+								}
+								else
+								{
+									// Something went wrong
+									$this->responseCode = 500;
+									return json_encode(array("status" => "500 Internal Server Error","details" => "Couldn't fill calendar"));
+								}
+							}
+						break;
+						default:
+							//We can't have verbs in the calendar since everything works by id
+							$this->responseCode = 400;
+							return json_encode(array("status" => "400 Bad Request","details" => "calendarEvents are accessed by their integer id."));
+						break;
+					}
+				break;
+				default:
+					$this->responseCode = 405;
+					return json_encode(array("status" => "405 Method Not Allowed","details" => "Method Not Allowed"));
+				break;
+			}
 		}
 
 		protected function user()

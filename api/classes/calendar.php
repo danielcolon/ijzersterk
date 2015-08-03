@@ -74,12 +74,12 @@ class calendarEvent
 	{
 		return array(
 			"id"          => $this->getId(),
-			"title"       => $this->getUserName(),
-			"description" => $this->getLastLoginAsString(),
-			"start"       => $this->getLastLoginIP(),
-			"end"         => $this->getCreatedAsString(),
-			"viewlevel"   => $this->getIsAdmin(),
-			"editlevel"   => $this->getFirstName()
+			"title"       => $this->getTitle(),
+			"description" => $this->getDescription(),
+			"start"       => $this->getStart(),
+			"end"         => $this->getEnd(),
+			"viewlevel"   => $this->getViewLevel(),
+			"editlevel"   => $this->getEditlevel()
 		);
 	}
 
@@ -167,7 +167,7 @@ class calendarEvent
 	//Fill
 	function fill()
 	{
-		if(!isset($this->Id))
+		if(is_null($this->getId()))
 		{
 			trigger_error('Can\'t fill without Id set.', E_USER_ERROR);
 		}
@@ -298,13 +298,12 @@ class calendar
 {
 	private $calendarEvents = array();
 
-		function getAsAssociativeArray()
+	function getAsAssociativeArray()
 	{
 		$result = array();
 		foreach($this->calendarEvents as $ACalendarEvent)
 		{
-			$Row = array($ACalendarEvent->getId => $ACalendarEvent=>getTitle);
-			array_merge($result, $Row);
+			array_push($result, $ACalendarEvent->getId());
 		}
 		return $result;
 	}
@@ -337,24 +336,24 @@ class calendar
 
 		if($ADatabase->query($query) && $ADatabase->num_rows > 0)
 		{
-			//Load calendar data
-			$row = $ADatabase->QueryResult->fetch_assoc();
+			while($row = mysqli_fetch_assoc($ADatabase->QueryResult))
+			{
+				// Put into calendarEvents
+				$ACalendarEvent = new calendarEvent;
+				$ACalendarEvent->setId($row['id']);
+				$ACalendarEvent->setTitle($row['title']);
+				$ACalendarEvent->setDescription($row['description']);
+				$ACalendarEvent->setStart($row['start']);
+				$ACalendarEvent->setEnd($row['end']);
+				$ACalendarEvent->setViewLevel($row['viewlevel']);
+				$ACalendarEvent->setEditLevel($row['editlevel']);
 
-			// Put into calendarEvents
-			$ACalendarEvent = new calendarEvent;
-			$ACalendarEvent->setId($row['id']);
-			$ACalendarEvent->setTitle($row['title']);
-			$ACalendarEvent->setDescription($row['description']);
-			$ACalendarEvent->setStart($row['start']);
-			$ACalendarEvent->setEnd($row['end']);
-			$ACalendarEvent->setViewLevel($row['viewlevel']);
-			$ACalendarEvent->setEditLevel($row['editlevel']);
+				$ACalendarEvent->setIsChanged(false);
+				$ACalendarEvent->setInDatabase(true);
+				array_push($this->calendarEvents, $ACalendarEvent);
 
-			$ACalendarEvent->setIsChanged(false);
-			$ACalendarEvent->setInDatabase(true);
-			array_push($this->calendarEvents, $ACalendarEvent);
-
-			$result = true;
+				$result = true;
+			}
 		}
 		else
 		{
