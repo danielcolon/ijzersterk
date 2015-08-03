@@ -8,7 +8,7 @@ default React.createClass({
                 <div id="website-live" className="article">
                     <h1>New website is live!</h1>
                     <div className="date">July 22, 2015 | <span className="name">Pouja</span></div>
-                    <p>Our new website with the new logo are live. We worked hard together with <a href="http://www.zokodesign.com">Zoko</a> to set up the new lay out of the website. Zoko also made the new logos:</p>
+                    <p>Our new website with the new logo is live. We worked hard together with <a href="http://www.zokodesign.com">Zoko</a> to set up the new lay out of the website. Zoko also made the new logos:</p>
                     <div className="row">
                         <div className="col-md-5">
                             <img className="grey-bg" src="img/logorood.svg"/>
@@ -17,8 +17,8 @@ default React.createClass({
                             <img className="grey-bg" src="img/logowit.svg"/>
                         </div>
                     </div>
-                    <p>All the news, blogs and latest changes will be posted on the website from now on. So make sure to follow the website. We will still send the newsletters, which will be also posted on the news page.</p>
-                    <p>A new feature we are working on is the agenda system. In this system it will be possible with your credentials to see who is going to train when. It will also be possible to indicate that you want to train with someone. It will be an awesome feature!</p>
+                    <p>All the news, blogs and latest changes will be posted on the website from now on. So make sure to follow the website. We will still send the newsletters, which will also be posted on the news page.</p>
+                    <p>A new feature we are working on is the agenda system. In this system it will be possible for members to log in and see who is going to train when. It will also be possible to indicate that you want to train with someone.</p>
                 </div>
                 <div id="newsletter2" className="article">
                     <h1>News letter #2</h1>
@@ -54,7 +54,7 @@ default React.createClass({
                         </div>
                         <div className="col-md-4">
                             <div className="thumbnail">
-                                <img  src="http://www.ijzersterkdelft.nl/images/150322/20150322-171822.jpg"/>
+                                <img src="http://www.ijzersterkdelft.nl/images/150322/20150322-171822.jpg"/>
                                 <div class="caption">
                                     The IJzersterk board at the award ceremony
                                 </div>
