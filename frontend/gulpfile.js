@@ -153,7 +153,7 @@ gulp.task('html-replace', function() {
         js: 'js/app.js'
     };
 
-    return gulp.src('*.html')
+    return gulp.src('index.html')
         .pipe(htmlReplace(replacements))
         .pipe(gulp.dest(config.distHtml));
 });

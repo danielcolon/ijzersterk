@@ -4,7 +4,7 @@ import {Link} from 'react-router';
 export
 default React.createClass({
     render() {
-        return (<div className="col-md-8 main">
+        return (<div className="col-md-8 col-md-offset-1 main">
                     <h1>DSKV IJzersterk</h1>
                     <span className="description">The student weightlifting association in Delft</span>
                     <div className="row main-img">
