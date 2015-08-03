@@ -128,7 +128,7 @@ gulp.task('styles', function() {
 });
 
 gulp.task('build-styles', function() {
-    return gulp.src(config.less)
+    return gulp.src(config.mainLess)
         .pipe(changed(config.distCss))
         .pipe(less({
             paths: [config.npmDir + '/bootstrap/less/']

@@ -10,6 +10,7 @@ default React.createClass({
     render() {
         return (
             <div className="cal-context" style={{width: '100%'}}>
+                Under construction
                 <div className="cal-row-fluid cal-row-head">
                     {moment.weekdays().map(this.renderWeekCell)}
                 </div>
