@@ -55,7 +55,8 @@ var csso = require('gulp-csso');
 var reload = browserSync.reload;
 var config = {
     jsx: './scripts/app.jsx',
-    less: 'styles/**/*.less',
+    less: 'styles/*.less',
+    mainLess: 'styles/global.less',
     bundle: 'app.js',
     distJs: 'dist/js',
     distCss: 'dist/css',
@@ -113,7 +114,7 @@ gulp.task('browserify', function() {
 
 // Parses and process the style files (from less to css)
 gulp.task('styles', function() {
-    return gulp.src(config.less)
+    return gulp.src(config.mainLess)
         .pipe(changed(config.distCss))
         .pipe(less({
             paths: [config.npmDir + '/bootstrap/less/']
