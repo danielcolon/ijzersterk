@@ -36,6 +36,7 @@
     "gulp-eslint": "^0.14.0",
     "gulp-html-replace": "^1.5.1",
     "gulp-image": "^1.0.1",
+    "gulp-less": "^3.0.3",
     "gulp-notify": "^2.2.0",
     "gulp-postcss": "^5.1.9",
     "gulp-sourcemaps": "^1.5.2",
