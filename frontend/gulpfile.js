@@ -2,9 +2,6 @@
 
 var gulp = require('gulp');
 
-// Concats css files into one file css
-var concatCss = require('gulp-concat-css');
-
 // Parses less files to css files
 var less = require('gulp-less');
 
@@ -44,9 +41,6 @@ var browserSync = require('browser-sync');
 // Gulp plugin to pipe CSS through several processors, but parse CSS only once.
 var postcss = require('gulp-postcss');
 
-// Places all the js and css files in the building blocks in the index.html into one file.
-var htmlReplace = require('gulp-html-replace');
-
 // Optimize PNG, JPG, GIF, SVG images
 var image = require('gulp-image');
 
@@ -55,7 +49,8 @@ var csso = require('gulp-csso');
 var reload = browserSync.reload;
 var config = {
     jsx: './scripts/app.jsx',
-    less: 'styles/**/*.less',
+    less: 'styles/*.less',
+    mainLess: 'styles/main.less',
     bundle: 'app.js',
     distJs: 'dist/js',
     distCss: 'dist/css',
@@ -74,7 +69,7 @@ gulp.task('clean', function(cb) {
 gulp.task('browserSync', function() {
     browserSync({
         server: {
-            baseDir: './'
+            baseDir: './dist/'
         },
         open: false
     });
@@ -113,42 +108,25 @@ gulp.task('browserify', function() {
 
 // Parses and process the style files (from less to css)
 gulp.task('styles', function() {
-    return gulp.src(config.less)
+    return gulp.src(config.mainLess)
         .pipe(changed(config.distCss))
         .pipe(less({
             paths: [config.npmDir + '/bootstrap/less/']
         }))
         .on('error', notify.onError())
         .pipe(postcss([autoprefixer('last 1 version')]))
-        .pipe(csso())
         .pipe(gulp.dest(config.distCss))
         .pipe(reload({
             stream: true
         }));
 });
 
-gulp.task('build-styles', function(){
-    return gulp.src(config.less)
-        .pipe(changed(config.distCss))
-        .pipe(less({
-            paths: [config.npmDir + '/bootstrap/less/']
-        }))
-        .on('error', notify.onError())
-        .pipe(postcss([autoprefixer('last 1 version')]))
-        .pipe(concatCss('main.css'))
-        .pipe(csso())
-        .pipe(gulp.dest(config.distCss));
-});
-
-gulp.task('html-replace', function() {
-    var replacements = {
-        css: 'css/main.css',
-        js: 'js/app.js'
-    };
-
-    return gulp.src('*.html')
-        .pipe(htmlReplace(replacements))
-        .pipe(gulp.dest(config.distHtml));
+gulp.task('html-copy', function() {
+    return gulp.src('index.html')
+        .pipe(gulp.dest(config.distHtml))
+        .pipe(reload({
+            stream: true
+        }));
 });
 
 gulp.task('image', function() {
@@ -165,17 +143,18 @@ gulp.task('lint', function() {
 });
 
 gulp.task('watchTask', function() {
+    gulp.watch('index.html', ['html-copy']);
     gulp.watch(config.less, ['styles']);
     gulp.watch('scripts/**/*.jsx', ['lint']);
 });
 
 gulp.task('watch', ['clean'], function() {
-    gulp.start(['browserSync', 'watchTask', 'watchify', 'styles', 'lint', 'image']);
+    gulp.start(['browserSync', 'watchTask', 'watchify', 'html-copy', 'styles', 'lint', 'image']);
 });
 
 gulp.task('build', ['clean'], function() {
     process.env.NODE_ENV = 'production';
-    gulp.start(['browserify', 'build-styles','html-replace', 'image']);
+    gulp.start(['browserify', 'styles', 'html-copy', 'image']);
 });
 
 gulp.task('default', function() {
