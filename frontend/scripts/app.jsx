@@ -1,3 +1,7 @@
+/**
+ * The starting point of the JavaScript in the website.
+ */
+
 import React from 'react';
 import Router from 'react-router';
 import Header from './views/Header.jsx';
@@ -12,6 +16,7 @@ import Login from './components/Login.jsx';
 var { Route, RouteHandler, DefaultRoute } = Router;
 window.React = React;
 
+// The app component the root components of all other components.
 var App = React.createClass({
     render(){
         return (<div>
@@ -26,6 +31,8 @@ var App = React.createClass({
     }
 });
 
+// Defines the routes within the website.
+// So going to domain.com/#/home will load the Home component.
 var routes = (
     <Route path="/" handler={App}>
         <DefaultRoute handler={Home}/>
@@ -37,6 +44,8 @@ var routes = (
         <Route name="admin" handler={Login}/>
     </Route>
 );
+
+// Inject the routes into the root component.
 Router.run(routes, function(Handler){
     React.render(<Handler/>, document.getElementById('react'));
 });
