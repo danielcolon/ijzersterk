@@ -6,7 +6,7 @@ default React.createClass({
     render() {
         return (<div className="col-md-7 col-md-offset-1 main">
                     <h1>DSKV IJzersterk</h1>
-                    <span className="description">The Delft student strenght-sport association</span>
+                    <span className="description">The Delft student strength-sport association</span>
                     <div className="row">
                         <img className="col-md-12 col-xs-12"
                             src="http://www.ijzersterkdelft.nl/images/150322/20150322-171822.jpg"/>
