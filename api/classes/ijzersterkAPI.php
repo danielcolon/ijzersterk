@@ -289,7 +289,7 @@
 									else
 									{
 										$this->responseCode = 200;
-										return json_encode(array("status" => "200 Ok", "details" => "User succesfully updated","result" => $AUser->getAsAssociativeArray()));
+										return json_encode(array("status" => "200 OK", "details" => "User succesfully updated","result" => $AUser->getAsAssociativeArray()));
 									}
 								}
 							}
@@ -319,7 +319,7 @@
 									if($AUser->Delete())
 									{
 										$this->responseCode = 200;
-										return json_encode(array("status" => "200 Ok", "details" => "User " . $this->verb . " succesfully deleted."));
+										return json_encode(array("status" => "200 OK", "details" => "User " . $this->verb . " succesfully deleted."));
 									}
 									else
 									{
@@ -347,33 +347,9 @@
 				break;
 			}
 
-			// Apparantly somethign went wrong if we still haven't returned
+			// Apparantly something went wrong if we still haven't returned
 			$this->responseCode = 400;
 			return json_encode(array("status" => "400 Bad Request","details" => "Nothing was done"));
-
-			/* Login (Might still want to use some of this when implementing OAuth)
-			if($this->verb == "login" && $this->method == 'PUT')
-			{
-				$PUTArray = json_decode($this->file, true);
-				// Check if it worked
-				if(is_null($PUTArray))
-				{
-					return json_encode(array("error" => "400 Bad Request","details" => "Couldn't decode json in PUT data"));
-				}
-
-				// Get the username and password
-				$AUsername = $PUTArray["username"];
-				$APassword = $PUTArray["password"];
-
-				// Check if we got those
-				if(is_null($AUsername) || is_null($APassword))
-				{
-					return json_encode(array("error" => "400 Bad Request","details" => "Username or password missing from PUT data"));
-				}
-
-				$AUser = new user;
-				return $AUser->login($AUsername, $APassword);
-			}*/
 		}
 	}
 ?>
