@@ -4,6 +4,15 @@ import classNames from 'classnames';
 
 export
 default React.createClass({
+    /**
+     * Creates a week box. Which shows which week is being focused.
+     * @return {React.div}
+     */
+    renderWeekBox(){
+        var mm = moment(this.props.date, 'YYYY-MM-DD');
+
+        return <div id="cal-week-box" data-cal-week>Week {mm.format('W')}</div>;
+    },
     render() {
         var mm = moment(this.props.date, 'YYYY-MM-DD');
         var monthMM = moment(this.props.viewMonth, 'YYYY-MM-DD');
@@ -17,6 +26,7 @@ default React.createClass({
             <div className="cal-cell1 cal-cell">
                 <div className={classes}>
                     <span className="pull-right" data-cal-date>{mm.date()}</span>
+                    {this.props.focusWeek ? this.renderWeekBox() : null}
                 </div>
             </div>
         );
