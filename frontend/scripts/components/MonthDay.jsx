@@ -11,7 +11,7 @@ default React.createClass({
             'cal-day-inmonth': mm.get('month') === monthMM.get('month'),
             'cal-day-outmonth': mm.get('month') !== monthMM.get('month')
         }, {
-            'cal-day-weekend': mm.get('day') === 0 || mm.get('day') === 1
+            'cal-day-weekend': mm.get('day') === 0 || mm.get('day') === 6
         });
         return (
             <div className="cal-cell1 cal-cell">

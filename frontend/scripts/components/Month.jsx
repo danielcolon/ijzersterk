@@ -4,7 +4,7 @@ import MonthDay from './MonthDay.jsx';
 import _ from 'lodash';
 
 var getFirst = function(mm) {
-    return mm.date(-mm.date(1).day() + 2);
+    return mm.date(-mm.date(1).day() + 1);
 };
 
 var getLast = function(mm) {
