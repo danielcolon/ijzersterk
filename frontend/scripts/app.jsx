@@ -8,7 +8,6 @@ import Header from './views/Header.jsx';
 import Footer from './views/Footer.jsx';
 import Home from './views/Home.jsx';
 import Blogs from './views/Blogs.jsx';
-import Calendar from './components/Calendar.jsx';
 import Newmember from './views/Newmember.jsx';
 import About from './views/About.jsx';
 import Login from './components/Login.jsx';
@@ -31,6 +30,12 @@ var App = React.createClass({
     }
 });
 
+var UnderConstruction = React.createClass({
+    render(){
+        return <h1>UNDER CONSTRUCTION</h1>;
+    }
+});
+
 // Defines the routes within the website.
 // So going to domain.com/#/home will load the Home component.
 var routes = (
@@ -38,7 +43,7 @@ var routes = (
         <DefaultRoute handler={Home}/>
         <Route name="home" handler={Home}/>
         <Route name="blogs" handler={Blogs}/>
-        <Route name="agenda" handler={Calendar}/>
+        <Route name="agenda" handler={UnderConstruction}/>
         <Route name="newmember" handler={Newmember}/>
         <Route name="about" handler={About}/>
         <Route name="admin" handler={Login}/>
