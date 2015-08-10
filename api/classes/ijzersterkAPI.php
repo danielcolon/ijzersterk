@@ -299,6 +299,46 @@
 								return json_encode(array("status" => "403 Forbidden","details" => "Only administrators can edit users other than themselves."));
 							}
 						break;
+						case 'DELETE':
+							// Only let admins delete users
+							if($this->currentUser->getIsAdmin())
+							{
+								// Try to fill for the given username
+								$AUser = new user();
+								$AUser->setUsername($this->verb);
+								if($AUser->fill())
+								{
+									// Admins cannot be deleted from the front end.
+									if($AUser->getIsAdmin())
+									{
+										$this->responseCode = 403;
+										return json_encode(array("status" => "403 Forbidden","details" => "Administrators cannot be deleted."));
+									}
+
+									// Delete it
+									if($AUser->Delete())
+									{
+										$this->responseCode = 200;
+										return json_encode(array("status" => "200 Ok", "details" => "User " . $this->verb . " succesfully deleted."));
+									}
+									else
+									{
+										$this->responseCode = 500;
+										return json_encode(array("status" => "500 Internal Server Error","details" => "Couldn't delete user " . $this->verb . "."));
+									}
+								}
+								else
+								{
+									$this->responseCode = 404;
+									return json_encode(array("status" => "404 Not Found","details" => "Couldn't find user " . $this->verb));
+								}
+							}
+							else
+							{
+								$this->responseCode = 403;
+								return json_encode(array("status" => "403 Forbidden","details" => "Admin rights required"));
+							}
+						break;
 						default:
 							$this->responseCode = 405;
 							return json_encode(array("status" => "405 Method Not Allowed","details" => "Method Not Allowed"));

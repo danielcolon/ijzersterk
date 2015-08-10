@@ -154,6 +154,7 @@ class user
 		{
 			if($ALastLogin == "0000-00-00 00:00:00")
 			{
+				// SQL returns this if a DateTime is null. So unset.
 				unset($this->lastLogin);
 			}
 			else
@@ -186,6 +187,7 @@ class user
 		{
 			if($ACreated == "0000-00-00 00:00:00")
 			{
+				// SQL returns this if a DateTime is null. So unset.
 				unset($this->created);
 			}
 			else
@@ -195,7 +197,7 @@ class user
 		}
 		else
 		{
-			$this->created = $ALastLogin;
+			$this->created = $ACreated;
 		}
 		$this->isChanged = TRUE;
 	}
@@ -381,7 +383,7 @@ class user
 
 				$this->setIsChanged(false);
 				$this->setInDatabase(true);
-				
+				trigger_error('Loaded ' . $row['username'], E_USER_NOTICE);
 				$result = true;
 			}
 			else
@@ -401,9 +403,47 @@ class user
 	}
 
 	//Database ##########################################
+	function delete($ADatabase = null)
+	{
+		$result = FALSE;
+		//Make connection if we didn't get one
+		$receivedConnection = !is_null($ADatabase);
+		if(!$receivedConnection)
+		{
+			// Make one
+			$ADatabase = new TDatabase;
+			// Make connection
+			if(!$ADatabase->Connect())
+			{
+				return $result;
+			}
+		}
+
+		if(!is_null($this->getId()) && !is_null($this->getUsername()))
+		{
+			$SQL = 'DELETE FROM users WHERE id = ' . $this->getId() . ';';
+
+			if($ADatabase->query($SQL))
+			{
+				// Don't delete $this but make sure we know we're no longer in the DB
+				$this->setInDatabase(FALSE);
+				$this->setIsChanged(FALSE);
+				$result = TRUE;
+			}
+		}
+
+		if(!$receivedConnection)
+		{
+			//Close database connection only if we made it ourselves
+			$ADatabase->disconnect();
+		}
+
+		return $result;
+	}
+
 	function addToDatabase()
 	{
-		//Connect
+		// Connect
 		$Database = new Tdatabase;
 		$Database->connect();
 		
@@ -457,7 +497,6 @@ class user
 		{
 			$this->setInDatabase(true);
 
-			//Verbreek verbinding
 			$Database->disconnect();
 			return TRUE;
 		}
