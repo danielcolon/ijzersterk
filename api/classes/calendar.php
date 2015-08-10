@@ -33,25 +33,11 @@ class calendarEvent
 	}
 	function getStart()
 	{
-		if(isset($this->start))
-		{
-			return $this->start;
-		}
-		else
-		{
-			return null;
-		}
+		return $this->start;
 	}
 	function getEnd()
 	{
-		if(isset($this->end))
-		{
-			return $this->end;
-		}
-		else
-		{
-			return null;
-		}
+		return $this->end;
 	}
 	function getEditLevel()
 	{
