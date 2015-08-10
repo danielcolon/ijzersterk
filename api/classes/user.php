@@ -274,12 +274,7 @@ class user
 			$this->setUsername($AUsername);
 			if($this->fill($database))
 			{
-				if($this->checkPassword($APassword))
-				{
-					$database->disconnect();
-					return true;
-				}
-				else
+				if(!$this->checkPassword($APassword))
 				{
 					trigger_error("Invalid password supplied for username: $AUsername", E_USER_NOTICE);
 					$database->disconnect();
@@ -293,6 +288,16 @@ class user
 				$database->disconnect();
 				return false;
 			}
+
+			// Set the last login date and IP
+			$this->setLastLogin(new DateTime());
+			$this->setLastLoginIP($_SERVER['REMOTE_ADDR']);
+			// Don't check if this works. If it crashes bad enough to 500 we'll see it in the logs
+			// otherwise it doesn't really matter
+			$this->addToDatabase();
+
+			$database->disconnect();
+			return true;
 		}
 	}
 	
@@ -446,7 +451,6 @@ class user
 		$SQL = trim(preg_replace('/\n+/', '',preg_replace('/\t+/', '', $SQL)));
 		if($Database->query($SQL))
 		{
-			trigger_error("Query succes", E_USER_NOTICE);
 			$this->setInDatabase(true);
 
 			//Verbreek verbinding

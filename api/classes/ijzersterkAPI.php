@@ -87,7 +87,6 @@
 						{
 							// Try to return the calendarEvent for the given id
 							// We don't have to clean input since it's just an int.
-							trigger_error(print_r($this->args[0], true), E_USER_NOTICE);
 							$ACalendarEvent = new calendarEvent;
 							$ACalendarEvent->setId($this->args[0]);
 							if($ACalendarEvent->fill())
