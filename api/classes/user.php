@@ -35,26 +35,23 @@ class user
 
 	function getLastLogin()
 	{
-		if(isset($this->lastLogin))
-		{
-			return $this->lastLogin;
-		}
-		else
-		{
-			return null;
-		}
+		return $this->lastLogin;
 	}
 
-	function getLastLoginAsString()
+	function getLastLoginAsString($AsUTC = FALSE)
 	{
-		if(isset($this->lastLogin))
+		// First check if it's even set
+		if(is_null($this->getLastLogin()))
 		{
-			return $this->getLastLogin()->format('Y-m-d H:i:s');
+			return NULL;
 		}
-		else
+
+		if($AsUTC && !is_null($this->getLastLogin()))
 		{
-			return null;
+			return $this->getLastLogin()->format(DateTime::ISO8601);
 		}
+		// Default is for SQL
+		return $this->getLastLogin()->format('Y-m-d H:i:s');
 	}
 
 	function getLastLoginIP()
@@ -64,17 +61,22 @@ class user
 
 	function getCreated()
 	{
-		// Check if we just got created
-		if(!isset($this->created))
-		{
-			// If so, return now
-			return new DateTime;
-		}
 		return $this->created;
 	}
 
-	function getCreatedAsString()
+	function getCreatedAsString($AsUTC = FALSE)
 	{
+		// First check if it's even set
+		if(is_null($this->getCreated()))
+		{
+			return NULL;
+		}
+
+		if($AsUTC && !is_null($this->getCreated()))
+		{
+			return $this->getCreated()->format(DateTime::ISO8601);
+		}
+		// Default is for SQL
 		return $this->getCreated()->format('Y-m-d H:i:s');
 	}
 
@@ -123,9 +125,9 @@ class user
 		return array(
 			"id"          => $this->getId(),
 			"username"    => $this->getUserName(),
-			"lastLogin"   => $this->getLastLoginAsString(),
+			"lastLogin"   => $this->getLastLoginAsString(true),
 			"lastLoginIP" => $this->getLastLoginIP(),
-			"created"     => $this->getCreatedAsString(),
+			"created"     => $this->getCreatedAsString(true),
 			"isAdmin"     => $this->getIsAdmin(),
 			"firstName"   => $this->getFirstName(),
 			"lastName"    => $this->getLastName(),
@@ -445,6 +447,8 @@ class user
 					'" . $this->getFirstName() . "',
 					'" . $this->getLastName() . "',
 					'" . $this->getEmail() . "');";
+			// We just got created
+			$this->setCreated(new DateTime());
 		}
 
 		//remove tabs and spaces. Can't be arsed to combine these regexes into one right now (since I'll have to learn regex first)
