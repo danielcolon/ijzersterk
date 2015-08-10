@@ -31,12 +31,20 @@ class calendarEvent
 	{
 		return $this->description;
 	}
-	function getStart()
+	function getStart($AsUTC = FALSE)
 	{
+		if($AsUTC && isset($this->start))
+		{
+			return $this->start->format(DateTime::ISO8601);
+		}
 		return $this->start;
 	}
-	function getEnd()
+	function getEnd($AsUTC = FALSE)
 	{
+		if($AsUTC && isset($this->end))
+		{
+			return $this->end->format(DateTime::ISO8601);
+		}
 		return $this->end;
 	}
 	function getEditLevel()
@@ -62,8 +70,8 @@ class calendarEvent
 			"id"          => $this->getId(),
 			"title"       => $this->getTitle(),
 			"description" => $this->getDescription(),
-			"start"       => $this->getStart(),
-			"end"         => $this->getEnd(),
+			"start"       => $this->getStart(true),
+			"end"         => $this->getEnd(true),
 			"viewlevel"   => $this->getViewLevel(),
 			"editlevel"   => $this->getEditlevel()
 		);
