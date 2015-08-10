@@ -21,7 +21,7 @@ default React.createClass({
         let end = getLast(moment(this.props.date, 'YYYY-MM-DD'));
         let weeks = [];
         while (current.isBefore(end) || current.isSame(end)) {
-            weeks.push(<MonthDay date={current.format('YYYY-MM-DD')}/>);
+            weeks.push(<MonthDay date={current.format('YYYY-MM-DD')} viewMonth={this.props.date}/>);
             current.add(1, 'day');
         }
         return _(weeks)
