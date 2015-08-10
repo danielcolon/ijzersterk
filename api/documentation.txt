@@ -126,6 +126,14 @@ Resources
 				400 Bad Request - Nothing was done - The server didn't see a function fitting for your endpoint, data and method
 				400 Bad Request - No password provided for new user
 				400 Bad Request - Couldn't decode json input data - Couldn't decode data with PHP json_decode
+		DELETE (user <username>)(admin)
+			STATUS
+				200 OK                    - User <username> succesfully deleted.
+				403 Forbidden             - Admin rights required
+				403 Forbidden             - Administrators cannot be deleted.
+				404 Not Found             - Couldn't find user <username>
+				405 Method Not Allowed    - Method Not Allowed
+				500 Internal Server Error - Couldn't delete user <username>.
 
 	requestinfo
 		A special function that will respond with the data sent to the server for the purpose of debugging
