@@ -20,9 +20,12 @@
 				//'calendar' //Some of calendar is accessible to the public.
 			);
 			$publicVerbs = array(
-				'verify'
+				'verify' => 'user'
 			);
-			if(in_array($this->endpoint, $publicFunctions) || in_array($this->verb, $publicVerbs))
+
+			// Only allow access without logging in to allow endpoints or to an endpoints verb
+			// if the verb exists in the pubicVerbs array and matches the endpoint
+			if(in_array($this->endpoint, $publicFunctions) || (array_key_exists($this->verb, $publicVerbs) && $publicVerbs[$this->verb] == $this->endpoint))
 			{
 				return parent::processAPI();
 			}
