@@ -8,6 +8,7 @@ import Header from './views/Header.jsx';
 import Footer from './views/Footer.jsx';
 import Home from './views/Home.jsx';
 import Blogs from './views/Blogs.jsx';
+import Calendar from './components/Calendar.jsx';
 import Newmember from './views/Newmember.jsx';
 import About from './views/About.jsx';
 import Login from './components/Login.jsx';
@@ -46,6 +47,7 @@ var routes = (
         <Route name="agenda" handler={UnderConstruction}/>
         <Route name="newmember" handler={Newmember}/>
         <Route name="about" handler={About}/>
+        <Route name="secret" handler={Calendar}/>
         <Route name="admin" handler={Login}/>
     </Route>
 );
