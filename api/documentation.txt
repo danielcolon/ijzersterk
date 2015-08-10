@@ -89,14 +89,25 @@ Resources
 				500 Internal Server Error - Couldn't load users    - Something went wrong on the server check apache logs
 				403 Forbidden             - Admin rights required
 
+	/user/verify
+		A special function that returns whether user credentials supplied in header are valid.
+		No login required
+		POST
+			RESULT
+			[
+				bool isOk - returns whether the credentials are valid or not
+			]
+				200 OK                 - User verified
+				405 Method Not Allowed - Method Not Allowed
+
 	/user/<username>
 		GET (user <username>)(admin)
 			RESULT
 			{
 				int      id
 				string   username
-				DateTime lastLogin   NOT IMPLEMENTED
-				string   lastLoginIP NOT IMPLEMENTED
+				DateTime lastLogin
+				string   lastLoginIP
 				DateTime created
 				bool     isAdmin
 				string   firstName
@@ -110,6 +121,8 @@ Resources
 				403 Forbidden - Admin rights required - Only admins can get other users
 
 		PUT (user <username>)(admin)
+			Updates a user with data put.
+			Creates a user if it doesn't exist yet.
 			DATA
 			{
 				bool   isAdmin (admin, otherwise ignored)
@@ -135,18 +148,22 @@ Resources
 				405 Method Not Allowed    - Method Not Allowed
 				500 Internal Server Error - Couldn't delete user <username>.
 
-	requestinfo
+	/requestinfo
 		A special function that will respond with the data sent to the server for the purpose of debugging
+		No authentication required
 		RESULT
-				string method   - method like POST, GET etc.
-				string endpoint
-				string verb     - e.g. <username>
-				string args     - arguments in post. Not used
-				string data     - data sent
-				string request  - e.g. requestinfo
-				string username - username from header
-				string password - password from header
-			);
+		[
+			string method   - method like POST, GET etc.
+			string endpoint
+			string verb     - e.g. <username>
+			string args     - arguments in post. Not used
+			string data     - data sent
+			string request  - e.g. requestinfo
+			string username - username from header
+			string password - password from header
+		]
+	/calendar
+		
 
 NOT IMPLEMENTED
 	/page
