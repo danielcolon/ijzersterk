@@ -51,8 +51,8 @@ default React.createClass({
      * @param  {Array} days  An array of MonthDay components.
      * @return {React.component}       A React component to be rendered.
      */
-    renderWeek(days) {
-        return <div className="cal-row-fluid cal-before-eventlist"
+    renderWeek(days, index) {
+        return <div key={index} className="cal-row-fluid cal-before-eventlist"
             onMouseEnter={this.toggleFocusWeek.bind(null, days[0].props.date, true)}
             onMouseLeave={this.toggleFocusWeek.bind(null, days[0].props.date, false)}>
                 {days}
@@ -71,6 +71,7 @@ default React.createClass({
                 && current.format('W') === this.state.focusWeek;
 
             weeks.push(<MonthDay
+                key={current.format('DD-MM')}
                 date={current.format('YYYY-MM-DD')}
                 viewMonth={this.props.date}
                 focusWeek={focus}/>);

@@ -9,8 +9,8 @@ default React.createClass({
             date: moment()
         };
     },
-    renderWeekCell(week){
-        return <div className="cal-cell1">{week}</div>;
+    renderWeekCell(week, index){
+        return <div key={index} className="cal-cell1">{week}</div>;
     },
     prevMonth(){
         this.setState({
@@ -45,12 +45,12 @@ default React.createClass({
                     <h3>{this.state.date.format('MMMM YYYY')}</h3>
                 </div>
                 <div className="row">
-                    <div className="col-md-8">
+                    <div className="col-md-10">
                         <div className="cal-context">
-                            <div className="cal-row-fluid cal-row-head">
+                            <div key={1} className="cal-row-fluid cal-row-head">
                                 {moment.weekdays().map(this.renderWeekCell)}
                             </div>
-                            <Month date={this.state.date.format('YYYY-MM-DD')}></Month>
+                            <Month key={2} date={this.state.date.format('YYYY-MM-DD')}></Month>
                         </div>
                     </div>
                 </div>
