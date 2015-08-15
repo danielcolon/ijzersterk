@@ -175,15 +175,31 @@ Resources
 				int id - array of ids of calendarEvents
 			]
 			STATUS
-				200 OK                    - calendar returned
+				200 OK                    - Calendar returned
 				500 Internal Server Error - Couldn't fill calendar
 				405 Method Not Allowed    - Method Not Allowed
+		PUT NOT YET IMPLEMENTED
+			Returns all calendar events within a date range
+			DATA
+			{
+				DateTime start - Events starting after the given time will be returned
+				DateTime end   - as long as they start before end DateTime
+			}
+			RESULT
+				>>/calendar GET
+			STATUS
+				200 OK                    - Calendar returned
+				404 Not Found             - No calendarEvents found within supplied date range
+				500 Internal Server Error - Couldn't fill calendar
+				405 Method Not Allowed    - Method Not Allowed
+				400 Bad Request           - Couldn't decode json input data - Couldn't decode data with PHP json_decode
 
 	/calendar/<id>
 		GET
 			RESULT
 			{
 				int id
+				int idEventType     - id of the associated event type
 				string title        - The title to be displayed
 				string description  - The text to be displayed for the event. This can be html, contain hyperlinks etc. Maximum of 512 characters.
 				dateTime start
@@ -202,6 +218,32 @@ Resources
 				405 Method Not Allowed    - Method Not Allowed
 
 NOT IMPLEMENTED
+	/eventtype
+		Returns ids of all event types
+		GET
+			RESULT
+			[
+				int id - array of ids of eventTypes
+			]
+			STATUS
+				200 OK                    - List of eventTypes returned
+				500 Internal Server Error - Couldn't fill event types.
+				405 Method Not Allowed    - Method Not Allowed
+
+	/eventtype/<id>
+		GET
+			RESULT
+			[
+				int    id
+				string Name
+				string Description
+			]
+			STATUS
+				200 OK                    - eventType returned
+				404 Not Found             - Couldn't find eventType <id>
+				400 Bad Request           - eventTypes are accessed by their integer id.
+				405 Method Not Allowed    - Method Not Allowed
+
 	/page
 		GET
 			RESULT
