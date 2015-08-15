@@ -1,5 +1,11 @@
 Url
+	Production
 	http://api.ijzersterkdelft.nl
+	Testing
+	http://api.testing.ijzersterkdelft.nl
+
+	The website can be found at ijzersterkdelft.nl or testing.ijzersterkdelft.nl
+
 
 Protocols
 	http/1.1
@@ -52,12 +58,14 @@ Response
 			<returned object or array as described in Resources>
 		}/]
 	}
+	DateTime will always be formatted as ISO-8601
 
 	Examples:
+		DateTime format: 2015-08-07T18:30:27+02:00
 		GET api.ijzersterkdelft.nl/user/testadmin
-		"{\"status\":\"200 OK\",\"result\":{\"id\":\"4\",\"username\":\"testadmin\",\"lastLogin\":null,\"lastLoginIP\":\"0\",\"created\":\"2015-07-20 13:19:20\",\"isAdmin\":\"1\",\"firstName\":\"Test\",\"lastName\":\"Admin\",\"email\":\"\"}}"
+			"{\"status\":\"200 OK\",\"details\":\"User returned\",\"result\":{\"id\":\"3\",\"username\":\"testuser\",\"lastLogin\":\"2015-08-10T19:22:12+0200\",\"lastLoginIP\":\"84.106.100.95\",\"created\":\"2015-07-19T18:27:06+0200\",\"isAdmin\":\"0\",\"firstName\":\"Test\",\"lastName\":\"User\",\"email\":\"\"}}"
 		PUT -d "{\"firstname\":\"Test\",\"lastname\":\"User\"}" api.ijzersterkdelft.nl/user/testuser
-		"{\"status\":\"200 Ok\",\"details\":\"User succesfully updated\",\"result\":{\"id\":\"3\",\"username\":\"testuser\",\"lastLogin\":null,\"lastLoginIP\":\"0\",\"created\":\"2015-07-19 18:27:06\",\"isAdmin\":\"0\",\"firstName\":\"Test\",\"lastName\":\"User\",\"email\":\"\"}}"
+			"{\"status\":\"200 Ok\",\"details\":\"User succesfully updated\",\"result\":{\"id\":\"3\",\"username\":\"testuser\",\"lastLogin\":\"2015-08-10T19:22:12+0200\",\"lastLoginIP\":\"84.106.100.95\",\"created\":\"2015-07-19T18:27:06+0200\",\"isAdmin\":\"0\",\"firstName\":\"Test\",\"lastName\":\"User\",\"email\":\"\"}}"
 
 Resource Documentation Format
 	<endpoint>
@@ -89,14 +97,26 @@ Resources
 				500 Internal Server Error - Couldn't load users    - Something went wrong on the server check apache logs
 				403 Forbidden             - Admin rights required
 
+	/user/verify
+		A special function that returns whether user credentials supplied in header are valid.
+		No login required
+		POST
+			RESULT
+			[
+				bool isOk - returns whether the credentials are valid or not
+			]
+			STATUS
+				200 OK                 - User verified
+				405 Method Not Allowed - Method Not Allowed
+
 	/user/<username>
 		GET (user <username>)(admin)
 			RESULT
 			{
 				int      id
 				string   username
-				DateTime lastLogin   NOT IMPLEMENTED
-				string   lastLoginIP NOT IMPLEMENTED
+				DateTime lastLogin
+				string   lastLoginIP
 				DateTime created
 				bool     isAdmin
 				string   firstName
@@ -110,6 +130,8 @@ Resources
 				403 Forbidden - Admin rights required - Only admins can get other users
 
 		PUT (user <username>)(admin)
+			Updates a user with data put.
+			Creates a user if it doesn't exist yet.
 			DATA
 			{
 				bool   isAdmin (admin, otherwise ignored)
@@ -126,21 +148,138 @@ Resources
 				400 Bad Request - Nothing was done - The server didn't see a function fitting for your endpoint, data and method
 				400 Bad Request - No password provided for new user
 				400 Bad Request - Couldn't decode json input data - Couldn't decode data with PHP json_decode
+		DELETE (user <username>)(admin)
+			STATUS
+				200 OK                    - User <username> succesfully deleted.
+				403 Forbidden             - Admin rights required
+				403 Forbidden             - Administrators cannot be deleted.
+				404 Not Found             - Couldn't find user <username>
+				405 Method Not Allowed    - Method Not Allowed
+				500 Internal Server Error - Couldn't delete user <username>.
 
-	requestinfo
+	/requestinfo
 		A special function that will respond with the data sent to the server for the purpose of debugging
+		No authentication required
 		RESULT
-				string method   - method like POST, GET etc.
-				string endpoint
-				string verb     - e.g. <username>
-				string args     - arguments in post. Not used
-				string data     - data sent
-				string request  - e.g. requestinfo
-				string username - username from header
-				string password - password from header
-			);
+		[
+			string method   - method like POST, GET etc.
+			string endpoint
+			string verb     - e.g. <username>
+			string args     - arguments in post. Not used
+			string data     - data sent
+			string request  - e.g. requestinfo
+			string username - username from header
+			string password - password from header
+		]
+
+	/calendar
+		The calendar consists of a series of calendarEvents.
+		These can be CRUDed by id.
+		GET
+			RESULT
+			[
+				int id - array of ids of calendarEvents
+			]
+			STATUS
+				200 OK                    - Calendar returned
+				500 Internal Server Error - Couldn't fill calendar
+				405 Method Not Allowed    - Method Not Allowed
+		PUT NOT YET IMPLEMENTED
+			Returns all calendar events within a date range
+			DATA
+			{
+				DateTime start - Events starting after the given time will be returned
+				DateTime end   - as long as they start before end DateTime
+			}
+			RESULT
+				>>/calendar GET
+			STATUS
+				200 OK                    - Calendar returned
+				404 Not Found             - No calendarEvents found within supplied date range
+				500 Internal Server Error - Couldn't fill calendar
+				405 Method Not Allowed    - Method Not Allowed
+				400 Bad Request           - Couldn't decode json input data - Couldn't decode data with PHP json_decode
+
+	/calendar/<id>
+		GET
+			RESULT
+			{
+				int id
+				int idEventType     - id of the associated event type NOT YET IMPLEMENTED
+				int idOwner         - id of the user that created and thus owns the event NOT YET IMPLEMENTED
+				string title        - The title to be displayed
+				string description  - The text to be displayed for the event. This can be html, contain hyperlinks etc. Maximum of 512 characters.
+				dateTime start
+				dateTime end
+				int viewlevel       - Authorization level required to see: 0 for world, 1 for registered user, 2 for admin
+				int editlevel       - Authorization level required to edit: see levels above
+				array subscribed    - NOT YET IMPLEMENTED
+				[
+					string username - array of usernames subscribed to even
+				]
+			}
+			STATUS
+				200 OK                    - calendarEvent returned
+				404 Not Found             - Couldn't find calendarEvent <id>
+				400 Bad Request           - calendarEvents are accessed by their integer id.
+				405 Method Not Allowed    - Method Not Allowed
+		PUT  (user <idOwner>)(admin) NOT YET IMPLEMENTED
+			Updates a calendarEvent with data put.
+			Creates a calendarEvent if it doesn't exist yet.
+			DATA
+			{
+				int idEventType     - Required for new calendarEvent
+				int idOwner         - Set to user if not supplied
+				string title        - Required for new calendarEvent
+				string description
+				dateTime start      - Required for new calendarEvent
+				dateTime end        - Required for new calendarEvent
+				int viewlevel       - Set to 2 if not supplied for new calendarEvent
+				int editlevel       - Set to 2 if not supplied for new calendarEvent
+			}
+			RESULT
+				>>/calendar/<id> GET
+			STATUS
+				200 OK          - calendarEvent succesfully updated
+				201 Created     - New calendarEvent succesfully created
+				400 Bad Request - Nothing was done - The server didn't see a function fitting for your endpoint, data and method
+				400 Bad Request - Insufficient data provided for new calendarEvent
+				400 Bad Request - Couldn't decode json input data - Couldn't decode data with PHP json_decode
+		DELETE (user <idOwner>)(admin) NOT YET IMPLEMENTED
+			STATUS
+				200 OK                    - CalendarEvent <title> succesfully deleted.
+				403 Forbidden             - Admin rights required
+				404 Not Found             - Couldn't find calendarEvent <id>
+				405 Method Not Allowed    - Method Not Allowed
+				500 Internal Server Error - Couldn't delete calendarEvent <id>
 
 NOT IMPLEMENTED
+	/eventtype
+		Returns ids of all event types
+		GET
+			RESULT
+			[
+				int id - array of ids of eventTypes
+			]
+			STATUS
+				200 OK                    - List of eventTypes returned
+				500 Internal Server Error - Couldn't fill event types.
+				405 Method Not Allowed    - Method Not Allowed
+
+	/eventtype/<id>
+		GET
+			RESULT
+			[
+				int    id
+				string Name
+				string Description
+			]
+			STATUS
+				200 OK                    - eventType returned
+				404 Not Found             - Couldn't find eventType <id>
+				400 Bad Request           - eventTypes are accessed by their integer id.
+				405 Method Not Allowed    - Method Not Allowed
+
 	/page
 		GET
 			RESULT
@@ -158,4 +297,3 @@ NOT IMPLEMENTED
 								i.e. nl or en
 			}
 			PUT, DELETE
-
