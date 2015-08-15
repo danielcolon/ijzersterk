@@ -1,5 +1,11 @@
 Url
+	Production
 	http://api.ijzersterkdelft.nl
+	Testing
+	http://api.testing.ijzersterkdelft.nl
+
+	The website can be found at ijzersterkdelft.nl or testing.ijzersterkdelft.nl
+
 
 Protocols
 	http/1.1
