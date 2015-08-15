@@ -199,7 +199,8 @@ Resources
 			RESULT
 			{
 				int id
-				int idEventType     - id of the associated event type
+				int idEventType     - id of the associated event type NOT YET IMPLEMENTED
+				int idOwner         - id of the user that created and thus owns the event NOT YET IMPLEMENTED
 				string title        - The title to be displayed
 				string description  - The text to be displayed for the event. This can be html, contain hyperlinks etc. Maximum of 512 characters.
 				dateTime start
@@ -216,6 +217,35 @@ Resources
 				404 Not Found             - Couldn't find calendarEvent <id>
 				400 Bad Request           - calendarEvents are accessed by their integer id.
 				405 Method Not Allowed    - Method Not Allowed
+		PUT  (user <idOwner>)(admin) NOT YET IMPLEMENTED
+			Updates a calendarEvent with data put.
+			Creates a calendarEvent if it doesn't exist yet.
+			DATA
+			{
+				int idEventType     - Required for new calendarEvent
+				int idOwner         - Set to user if not supplied
+				string title        - Required for new calendarEvent
+				string description
+				dateTime start      - Required for new calendarEvent
+				dateTime end        - Required for new calendarEvent
+				int viewlevel       - Set to 2 if not supplied for new calendarEvent
+				int editlevel       - Set to 2 if not supplied for new calendarEvent
+			}
+			RESULT
+				>>/calendar/<id> GET
+			STATUS
+				200 OK          - calendarEvent succesfully updated
+				201 Created     - New calendarEvent succesfully created
+				400 Bad Request - Nothing was done - The server didn't see a function fitting for your endpoint, data and method
+				400 Bad Request - Insufficient data provided for new calendarEvent
+				400 Bad Request - Couldn't decode json input data - Couldn't decode data with PHP json_decode
+		DELETE (user <idOwner>)(admin) NOT YET IMPLEMENTED
+			STATUS
+				200 OK                    - CalendarEvent <title> succesfully deleted.
+				403 Forbidden             - Admin rights required
+				404 Not Found             - Couldn't find calendarEvent <id>
+				405 Method Not Allowed    - Method Not Allowed
+				500 Internal Server Error - Couldn't delete calendarEvent <id>
 
 NOT IMPLEMENTED
 	/eventtype
