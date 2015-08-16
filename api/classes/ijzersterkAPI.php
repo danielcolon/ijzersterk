@@ -56,6 +56,41 @@
 			return parent::processAPI();
 		}
 
+		protected function getDecodedData()
+		{
+			// Get the data being put
+			$PUTArray = json_decode($this->file, true);
+
+			// Check if it worked
+			if(is_null($PUTArray))
+			{
+				// Indicate something went wrong
+				return null;
+			}
+
+			// Sanitize user input
+			$DBTable  = 'users';
+
+			//Connect to database
+			$database = new TDatabase;
+
+			// Check connection
+			if(!$database->connect())
+			{
+				return null;
+			}
+
+			// Clean up
+			// &$value: use reference! This is NOT a pointer.
+			foreach ($PUTArray as $key => &$value)
+			{
+				$value = $database->clean($value);
+			}
+
+			$database->disconnect();
+			return $PUTArray;
+		}
+
 		// Show sender what he sent for debugging
 		protected function requestinfo()
 		{
@@ -203,6 +238,9 @@
 						return json_encode(array("status" => "500 Internal Server Error","details" => "Couldn't connect to database"));
 					}
 					$this->verb = $ADatabase->clean($this->verb);
+					// Don't keep the connection for fills.
+					// slightly less optimized but we won't have to close through hoops
+					// to close if before returning
 					$ADatabase->disconnect();
 
 					switch($this->method){
@@ -244,10 +282,9 @@
 								$AUser = new user;
 								$AUser->setUsername($this->verb);
 
-								// Get the data being put
-								$PUTArray = json_decode($this->file, true);
+								// Get a sanitized version of the data put
+								$PUTArray = $this->getDecodedData();
 
-								// Check if it worked
 								if(is_null($PUTArray))
 								{
 									$this->responseCode = 400;

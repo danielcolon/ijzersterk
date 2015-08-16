@@ -258,7 +258,7 @@ class user
 		if(!is_null($AUsername) && !is_null($APassword))
 		{
 			$dirname = dirname(__FILE__);
-			require("$dirname/database.php");
+			require_once("$dirname/database.php");
 			$DBTable  = 'users';
 
 			//Connect to database
@@ -383,7 +383,6 @@ class user
 
 				$this->setIsChanged(false);
 				$this->setInDatabase(true);
-				trigger_error('Loaded ' . $row['username'], E_USER_NOTICE);
 				$result = true;
 			}
 			else
