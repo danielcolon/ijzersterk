@@ -102,7 +102,7 @@
 				'args'     => $this->args,
 				'data'     => $this->file,
 				'request'  => $this->request,
-				'username'     => isset($_SERVER['PHP_AUTH_USER']) ? $_SERVER['PHP_AUTH_USER'] : 'No user provided',
+				'username' => isset($_SERVER['PHP_AUTH_USER']) ? $_SERVER['PHP_AUTH_USER'] : 'No user provided',
 				'password' => isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : 'No password provided'
 			);
 			return json_encode(array("status" => "200 OK","details" => "RequestInfo returned","result" => $result));
@@ -110,53 +110,116 @@
 
 		protected function calendar()
 		{
+			if($this->verb != "")
+			{
+				//We can't have verbs in the calendar since everything works by id
+				$this->responseCode = 400;
+				return json_encode(array("status" => "400 Bad Request","details" => "calendarEvents are accessed by their integer id."));
+			}
+
 			$dirname = dirname(__FILE__);
 			require_once("$dirname/calendar.php");
+
 			switch($this->method){
 				case 'GET':
 					// Empty verb means user requested a list calendar events
-					if($this->verb == "")
+					// Unless and id was supplied as argument
+					if(isset($this->args[0]) && is_numeric($this->args[0]))
 					{
-						// Unless and id was supplied as argument
-						if(isset($this->args[0]) && is_numeric($this->args[0]))
+						// Try to return the calendarEvent for the given id
+						// We don't have to clean input since it's just an int.
+						$ACalendarEvent = new calendarEvent;
+						$ACalendarEvent->setId($this->args[0]);
+						if($ACalendarEvent->fill())
 						{
-							// Try to return the calendarEvent for the given id
-							// We don't have to clean input since it's just an int.
-							$ACalendarEvent = new calendarEvent;
-							$ACalendarEvent->setId($this->args[0]);
-							if($ACalendarEvent->fill())
-							{
-								$this->responseCode = 200;
-								return json_encode(array("status" => "200 OK","details" => "calendarEvent returned", "result" =>  $ACalendarEvent->getAsAssociativeArray()));
-							}
-							else
-							{
-								$this->responseCode = 404;
-								return json_encode(array("status" => "404 Not Found","details" => "Couldn't find calendarEvent " . $this->args[0]));
-							}
+							$this->responseCode = 200;
+							return json_encode(array("status" => "200 OK","details" => "calendarEvent returned", "result" =>  $ACalendarEvent->getAsAssociativeArray()));
 						}
 						else
 						{
-							// If we have an empty verb and no args the user has requested a list of calendarEvents
-							$ACalendar = new calendar;
-							if($ACalendar->fill())
-							{
-								$this->responseCode = 200;
-								return json_encode(array("status" => "200 OK","details" => "calendar returned", "result" =>  $ACalendar->getAsAssociativeArray()));
-							}
-							else
-							{
-								// Something went wrong
-								$this->responseCode = 500;
-								return json_encode(array("status" => "500 Internal Server Error","details" => "Couldn't fill calendar"));
-							}
+							$this->responseCode = 404;
+							return json_encode(array("status" => "404 Not Found","details" => "Couldn't find calendarEvent " . $this->args[0]));
 						}
 					}
 					else
 					{
-						//We can't have verbs in the calendar since everything works by id
-						$this->responseCode = 400;
-						return json_encode(array("status" => "400 Bad Request","details" => "calendarEvents are accessed by their integer id."));
+						// If we have an empty verb and no args the user has requested a list of calendarEvents
+						$ACalendar = new calendar;
+						if($ACalendar->fill())
+						{
+							$this->responseCode = 200;
+							return json_encode(array("status" => "200 OK","details" => "calendar returned", "result" =>  $ACalendar->getAsAssociativeArray()));
+						}
+						else
+						{
+							// Something went wrong
+							$this->responseCode = 500;
+							return json_encode(array("status" => "500 Internal Server Error","details" => "Couldn't fill calendar"));
+						}
+					}
+				break;
+				case 'PUT':
+					// We're going to make a new calendar event or update an existing one
+					// first check if we have args
+					$ACalendarEvent = new calendarEvent;
+
+					if(isset($this->args[0]) && is_numeric($this->args[0]))
+					{
+						$ACalendarEvent->setId($this->args[0]);
+						// This might fill if the id doesn't exist, but we'll just make a new one then
+						$ACalendarEvent->fill();
+					}
+
+					// Remember if we're a new calendarEvent
+					$isNew = !$ACalendarEvent->getInDatabase();
+
+					// Get sanitized data
+					$PUTArray = $this->getDecodedData();
+
+					// Check if we're getting all required data for a new event
+					if($isNew)
+					{
+						if(!isset($PUTArray['idEventType']) || !isset($PUTArray['title']) || !isset($PUTArray['start']) || !isset($PUTArray['end']))
+						{
+							$this->responseCode = 400;
+							return json_encode(array("status" => "400 Bad Request","details" => "Insufficient data provided for new calendarEvent"));
+						}
+						// if an idOwner isn't set we'll set it to currently logged in user
+						if(!isset($PUTArray['idOwner']))
+						{
+							$PUTArray['idOwner'] = $this->currentUser->getId();
+						}
+					}
+
+					// Put in in the event
+					if(isset($PUTArray["idEventType"])) $ACalendarEvent->setIdEventType($PUTArray['idEventType']);
+					if(isset($PUTArray["idOwner"])) $ACalendarEvent->setIdOwner($PUTArray['idOwner']);
+					if(isset($PUTArray["title"])) $ACalendarEvent->setTitle($PUTArray['title']);
+					if(isset($PUTArray["description"])) $ACalendarEvent->setDescription($PUTArray['description']);
+					if(isset($PUTArray["start"])) $ACalendarEvent->setStart($PUTArray['start']);
+					if(isset($PUTArray["end"])) $ACalendarEvent->setEnd($PUTArray['end']);
+					if(isset($PUTArray["viewlevel"])) $ACalendarEvent->setViewLevel($PUTArray['viewlevel']);
+					if(isset($PUTArray["editlevel"])) $ACalendarEvent->setEditLevel($PUTArray['editlevel']);
+
+					// The calendarEvent object will handle whether we'll add a calendarEvent or update a calendarEvent depending on if
+					// it was found in the database or not
+					if($ACalendarEvent->addToDatabase())
+					{
+						if($isNew) 
+						{
+							$this->responseCode = 201;
+							return json_encode(array("status" => "201 Created", "details" => "New calendarEvent succesfully created","result" => $ACalendarEvent->getAsAssociativeArray()));
+						}
+						else
+						{
+							$this->responseCode = 200;
+							return json_encode(array("status" => "200 OK", "details" => "calendarEvent succesfully updated","result" => $ACalendarEvent->getAsAssociativeArray()));
+						}
+					}
+					else
+					{
+						$this->responseCode = 500;
+						return json_encode(array("status" => "500 Internal Server Error","details" => "Couldn't save calendarEvent"));
 					}
 				break;
 				default:
@@ -328,6 +391,11 @@
 										$this->responseCode = 200;
 										return json_encode(array("status" => "200 OK", "details" => "User succesfully updated","result" => $AUser->getAsAssociativeArray()));
 									}
+								}
+								else
+								{
+									$this->responseCode = 500;
+									return json_encode(array("status" => "500 Internal Server Error","details" => "Couldn't save user"));
 								}
 							}
 							else

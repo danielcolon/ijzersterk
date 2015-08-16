@@ -9,19 +9,29 @@ class calendarEvent
 {
 	//Properties
 	private $id;
+	private $idOwner;
+	private $idEventType;
 	private $title;
 	private $description;
 	private $start;
-	private $end;
 	private $editLevel;
 	private $viewLevel;
 	private $inDatabase;
 	private $isChanged;
+	private $end;
 
 	//Getters
 	function getId()
 	{
 		return $this->id;
+	}
+	function getIdOwner()
+	{
+		return $this->idOwner;
+	}
+	function getIdEventType()
+	{
+		return $this->idEventType;
 	}
 	function getTitle()
 	{
@@ -31,21 +41,43 @@ class calendarEvent
 	{
 		return $this->description;
 	}
-	function getStart($AsUTC = FALSE)
+	function getStart()
 	{
-		if($AsUTC && isset($this->start))
-		{
-			return $this->start->format(DateTime::ISO8601);
-		}
 		return $this->start;
 	}
-	function getEnd($AsUTC = FALSE)
+	function getStartAsString($AsUTC = FALSE)
 	{
-		if($AsUTC && isset($this->end))
+		// First check if it's even set
+		if(is_null($this->getStart()))
 		{
-			return $this->end->format(DateTime::ISO8601);
+			return NULL;
 		}
+
+		if($AsUTC)
+		{
+			return $this->getStart()->format(DateTime::ISO8601);
+		}
+		// Default is for SQL
+		return $this->getStart()->format('Y-m-d H:i:s');
+	}
+	function getEnd()
+	{
 		return $this->end;
+	}
+	function getEndAsString($AsUTC = FALSE)
+	{
+		// First check if it's even set
+		if(is_null($this->getEnd()))
+		{
+			return NULL;
+		}
+
+		if($AsUTC)
+		{
+			return $this->getEnd()->format(DateTime::ISO8601);
+		}
+		// Default is for SQL
+		return $this->getStart()->format('Y-m-d H:i:s');
 	}
 	function getEditLevel()
 	{
@@ -68,10 +100,12 @@ class calendarEvent
 	{
 		return array(
 			"id"          => $this->getId(),
+			"idowner"     => $this->getIdOwner(),
+			"ideventtype" => $this->getIdEventType(),
 			"title"       => $this->getTitle(),
 			"description" => $this->getDescription(),
-			"start"       => $this->getStart(true),
-			"end"         => $this->getEnd(true),
+			"start"       => $this->getStartAsString(true),
+			"end"         => $this->getEndAsString(true),
 			"viewlevel"   => $this->getViewLevel(),
 			"editlevel"   => $this->getEditlevel()
 		);
@@ -81,6 +115,16 @@ class calendarEvent
 	function setId($Aid)
 	{
 		$this->id = $Aid;
+		$this->FIsChanged = TRUE;
+	}
+	function setIdOwner($AidOwner)
+	{
+		$this->idOwner = $AidOwner;
+		$this->FIsChanged = TRUE;
+	}
+	function setIdEventType($AidEventType)
+	{
+		$this->idEventType = $AidEventType;
 		$this->FIsChanged = TRUE;
 	}
 	function setTitle($Atitle)
@@ -103,7 +147,14 @@ class calendarEvent
 			}
 			else
 			{
-				$this->start = DateTime::createFromFormat('Y-m-d H:i:s', $Astart);
+				if(DateTime::createFromFormat('Y-m-d H:i:s', $Astart) != false)
+				{
+					$this->start = DateTime::createFromFormat('Y-m-d H:i:s', $Astart);
+				}
+				else
+				{
+					$this->start = DateTime::createFromFormat(DateTime::ISO8601, $Astart);
+				}
 			}
 		}
 		else
@@ -123,7 +174,14 @@ class calendarEvent
 			}
 			else
 			{
-				$this->end = DateTime::createFromFormat('Y-m-d H:i:s', $Aend);
+				if(DateTime::createFromFormat('Y-m-d H:i:s', $Aend) != false)
+				{
+					$this->end = DateTime::createFromFormat('Y-m-d H:i:s', $Aend);
+				}
+				else
+				{
+					$this->end = DateTime::createFromFormat(DateTime::ISO8601, $Aend);
+				}
 			}
 		}
 		else
@@ -200,6 +258,8 @@ class calendarEvent
 				$row = $ADatabase->QueryResult->fetch_assoc();
 
 				$this->setId($row['id']);
+				$this->setIdOwner($row['idowner']);
+				$this->setIdEventType($row['ideventtype']);
 				$this->setTitle($row['title']);
 				$this->setDescription($row['description']);
 				$this->setStart($row['start']);
@@ -240,10 +300,12 @@ class calendarEvent
 			$SQL="
 				UPDATE `calendar` SET 
 				id = '" . $this->getId() . "',
+				idowner = '" . $this->getIdOwner() . "',
+				ideventtype = '" . $this->getIdEventType() . "',
 				title = '" . $this->getTitle() . "',
 				description = '" . $this->getDescription() . "',
-				start = '" . $this->getStart() . "',
-				end = '" . $this->getEnd() . "',
+				start = '" . $this->getStartAsString() . "',
+				end = '" . $this->getEndAsString() . "',
 				editlevel = '" . $this->getEditLevel() . "',
 				viewlevel = '" . $this->getViewLevel() . "'
 				WHERE id=" . $this->getId() . ";";
@@ -255,6 +317,8 @@ class calendarEvent
 			$SQL="
 				INSERT INTO `calendar`  (
 				id,
+				idowner,
+				ideventtype,
 				title,
 				description,
 				start,
@@ -263,10 +327,12 @@ class calendarEvent
 				viewlevel)
 			VALUES (
 				'" . $this->getId() . "',
+				'" . $this->getIdOwner() . "',
+				'" . $this->getIdEventType() . "',
 				'" . $this->getTitle() . "',
 				'" . $this->getDescription() . "',
-				'" . $this->getStart() . "',
-				'" . $this->getEnd() . "',
+				'" . $this->getStartAsString() . "',
+				'" . $this->getEndAsString() . "',
 				'" . $this->getEditLevel() . "',
 				'" . $this->getViewLevel() . "');";
 		}
@@ -275,7 +341,6 @@ class calendarEvent
 		$SQL = trim(preg_replace('/\n+/', '',preg_replace('/\t+/', '', $SQL)));
 		if($Database->query($SQL))
 		{
-			trigger_error("Query succes", E_USER_NOTICE);
 			$this->setInDatabase(true);
 
 			//Verbreek verbinding
@@ -335,6 +400,8 @@ class calendar
 				// Put into calendarEvents
 				$ACalendarEvent = new calendarEvent;
 				$ACalendarEvent->setId($row['id']);
+				$ACalendarEvent->setIdOwner($row['idowner']);
+				$ACalendarEvent->setIdEventType($row['ideventtype']);
 				$ACalendarEvent->setTitle($row['title']);
 				$ACalendarEvent->setDescription($row['description']);
 				$ACalendarEvent->setStart($row['start']);
@@ -371,15 +438,20 @@ class calendar
 		$Database->connect();
 
 		$SQL = "
-		CREATE TABLE `ijzersterk`.`calendar` (
-			`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-			`title` VARCHAR(128) NULL,
-			`description` VARCHAR(512) NULL,
-			`start` DATETIME NULL,
-			`end` DATETIME NULL,
-			`viewlevel` TINYINT NULL,
-			`editlevel` TINYINT NULL,
-		PRIMARY KEY (`id`));";
+		CREATE TABLE `calendar`
+		(
+			`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+			`title` varchar(128) DEFAULT NULL,
+			`description` varchar(512) DEFAULT NULL,
+			`start` datetime DEFAULT NULL,
+			`end` datetime DEFAULT NULL,
+			`viewlevel` tinyint(4) DEFAULT NULL,
+			`editlevel` tinyint(4) DEFAULT NULL,
+			`idowner` int(6) DEFAULT NULL,
+			`ideventtype` int(6) DEFAULT NULL,
+			PRIMARY KEY (`id`)
+		)";
+		
 
 		//remove tabs and spaces. Can't be arsed to combine these regexes into one right now (since I'll have to learn regex first)
 		$SQL = trim(preg_replace('/\n+/', '',preg_replace('/\t+/', '', $SQL)));
