@@ -7,6 +7,21 @@ import _ from 'lodash';
 
 export
 default React.createClass({
+    getInitialState(){
+        return {
+            hover: false
+        };
+    },
+    mouseOver(){
+        this.setState({
+            hover: true
+        });
+    },
+    mouseLeave(){
+        this.setState({
+            hover: false
+        });
+    },
     getEvents(){
         var date = moment(this.props.date, 'YYYY-MM-DD');
         return AgendaEvents.events.filter(function(event){
@@ -21,14 +36,24 @@ default React.createClass({
      */
     renderWeekBox(){
         var date = moment(this.props.date, 'YYYY-MM-DD');
-        return <div id="cal-week-box" data-cal-week>Week {date.format('W')}</div>;
+        return (<div id="cal-week-box" data-cal-week>Week {date.format('W')}</div>);
+    },
+    renderDayTick(){
+        return (<div id="cal-day-tick">
+                    <span className="glyphicon glyphicon-chevron-down"></span>
+                </div>);
     },
     renderEvent(event, index){
         var tooltip = (<Tooltip>{event.title}</Tooltip>);
-        var style = _.find(AgendaEvents.types, {type: event.type}).style;
+        var style = _.find(AgendaEvents.types, {
+            type: event.type
+        }).style;
         var classes = classNames('pull-left', 'event', 'event-' + style);
-        return <OverlayTrigger key={index} placement='top' overlay={tooltip}>
-            <a href="#" data-event-class={'event-' + {style}} className={classes}></a>
+
+        return <OverlayTrigger key={index} placement='top'
+                overlay={tooltip}>
+                    <div data-event-class={'event-' + {style}} className={classes}>
+                </div>
             </OverlayTrigger>;
     },
     render() {
@@ -39,17 +64,18 @@ default React.createClass({
             'cal-day-inmonth': date.get('month') === monthMM.get('month'),
             'cal-day-outmonth': date.get('month') !== monthMM.get('month')
         }, {
-            'cal-day-weekend': date.get('day') === 0
-                || date.get('day') === 6
+            'cal-day-weekend': date.get('day') === 0 || date.get('day') === 6
         });
         return (
-            <div className="cal-cell1 cal-cell">
-                <div className={classes}>
+            <div className="cal-cell1 cal-cell" onMouseOver={this.mouseOver}
+                onMouseLeave={this.mouseLeave}>
+                <div className={classes} >
                     <span className="pull-right" data-cal-date>{date.date()}</span>
                     {this.props.focusWeek ? this.renderWeekBox() : null}
                     <div className="events-list">
                         {this.getEvents().map(this.renderEvent)}
                     </div>
+                    {this.state.hover && this.getEvents().length > 0 ? this.renderDayTick() : null}
                 </div>
             </div>
         );

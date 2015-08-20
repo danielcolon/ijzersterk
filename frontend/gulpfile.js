@@ -56,7 +56,8 @@ var config = {
     distCss: 'dist/css',
     distHtml: 'dist',
     distImg: 'dist/img',
-    npmDir: './node_modules'
+    npmDir: './node_modules',
+    distFonts: 'dist/fonts'
 };
 
 // Same as rm -rf dist
@@ -129,6 +130,11 @@ gulp.task('html-copy', function() {
         }));
 });
 
+gulp.task('fonts', function(){
+    return gulp.src(config.npmDir + '/bootstrap/fonts/**')
+        .pipe(gulp.dest(config.distFonts));
+});
+
 gulp.task('image', function() {
     return gulp.src('img/**')
         .pipe(image())
@@ -149,7 +155,7 @@ gulp.task('watchTask', function() {
 });
 
 gulp.task('watch', ['clean'], function() {
-    gulp.start(['browserSync', 'watchTask', 'watchify', 'html-copy', 'styles', 'lint', 'image']);
+    gulp.start(['browserSync', 'watchTask', 'watchify', 'html-copy', 'styles', 'fonts','lint', 'image']);
 });
 
 gulp.task('build', ['clean'], function() {
