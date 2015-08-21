@@ -1,7 +1,9 @@
-import React from 'react';
+import React from 'react/addons';
 import moment from 'moment';
 import MonthDay from './MonthDay.jsx';
 import _ from 'lodash';
+import AgendaEvents from '../models/AgendaEvents.js';
+import classNames from 'classnames';
 
 /**
  * Gets the fist visible day of the month calendar.
@@ -32,8 +34,27 @@ default React.createClass({
      */
     getInitialState(){
         return {
-            focusWeek: null
+            focusWeek: null,
+            focusDay: null
         };
+    },
+    /**
+     * Invoked when clicked on a day.
+     * Sets the focusDay state to that day if not already set, otherwise null.
+     * @param  {String} date The date which was clicked on in YYYY-MM-DD format.
+     */
+    onDayClick(date){
+        var mmDate = moment(date, 'YYYY-MM-DD');
+        var events = AgendaEvents.getEvents(mmDate);
+        if (events.length === 0 || this.state.focusDay === date) {
+            this.setState({
+                focusDay: null
+            });
+        } else {
+            this.setState({
+                focusDay: date
+            });
+        }
     },
     /**
      * Toggles the which week is being focused.
@@ -47,16 +68,64 @@ default React.createClass({
         });
     },
     /**
+     * Renders the slide box when clicking on a day.
+     * @param  {Number} dayIndex The n-th day that was on clicked.
+     * @param  {Array} events   The array of events for that day.
+     * @return {React.component} A cal-slide-box div.
+     */
+    renderSlideBox(dayIndex, events){
+        var renderEvent = function(event, index){
+            var style = _.find(AgendaEvents.types, {
+                type: event.type
+            }).style;
+            var classes = classNames('pull-left', 'event', 'event-' + style);
+            return (<li key={index}>
+                    <span className={classes}></span>&nbsp;
+                    <a href="#" data-event-id data-event-class={'event-' + style} className="event-item">
+                        {event.title}
+                    </a>
+                </li>);
+        };
+        var tickDay = 'tick-day' + (dayIndex + 1);
+        return (
+                <div id="cal-slide-box" key="cal-slide">
+                    <span id="cal-slide-tick" className={tickDay}></span>
+                    <div id="cal-slide-content" className="cal-event-list">
+                        <ul className="unstyled list-unstyled">
+                            {events.map(renderEvent)}
+                        </ul>
+                    </div>
+                </div>
+        );
+    },
+    /**
      * Renders a week in the month.
      * @param  {Array} days  An array of MonthDay components.
      * @return {React.component}       A React component to be rendered.
      */
     renderWeek(days, index) {
-        return <div key={index} className="cal-row-fluid cal-before-eventlist"
-            onMouseEnter={this.toggleFocusWeek.bind(null, days[0].props.date, true)}
-            onMouseLeave={this.toggleFocusWeek.bind(null, days[0].props.date, false)}>
-                {days}
-            </div>;
+        var slideBox = null;
+        if (this.state.focusDay !== null) {
+            var $self = this;
+            var dayIndex = _.findIndex(days, function(day) {
+                return day.props.date === $self.state.focusDay;
+            });
+
+            if (dayIndex !== -1) {
+                var events = AgendaEvents.getEvents(moment(this.state.focusDay, 'YYYY-MM-DD'));
+                slideBox = this.renderSlideBox(dayIndex, events);
+            }
+        }
+        return (
+                <div key={index}>
+                    <div className="cal-row-fluid cal-before-eventlist"
+                    onMouseEnter={this.toggleFocusWeek.bind(null, days[0].props.date, true)}
+                    onMouseLeave={this.toggleFocusWeek.bind(null, days[0].props.date, false)}>
+                        {days}
+                    </div>
+                    {slideBox}
+                </div>);
+
     },
     /**
      * @return {React.component} A calendar month to be rendered.
@@ -74,7 +143,9 @@ default React.createClass({
                 key={current.format('DD-MM')}
                 date={current.format('YYYY-MM-DD')}
                 viewMonth={this.props.date}
-                focusWeek={focus}/>);
+                focusWeek={focus}
+                onDayClick={this.onDayClick}
+                />);
 
             current.add(1, 'day');
         }

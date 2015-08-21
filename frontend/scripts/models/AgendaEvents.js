@@ -74,6 +74,13 @@ var AgendaEvents = {
         type: 'social',
         style: 'warning'
     }],
+    getEvents(date){
+        return AgendaEvents.events.filter(function(event){
+            return date.isBetween(event.startDate, event.endDate, 'day') ||
+                date.isSame(event.startDate, 'day') ||
+                date.isSame(event.endDate, 'day');
+        });
+    },
     fetch(){
         return new Promise((resolve, reject)=> {
             resolve();

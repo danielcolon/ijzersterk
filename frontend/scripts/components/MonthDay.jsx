@@ -9,8 +9,12 @@ export
 default React.createClass({
     getInitialState(){
         return {
-            hover: false
+            hover: false,
+            displayEvents: false
         };
+    },
+    onClick(){
+        this.props.onDayClick(this.props.date);
     },
     mouseOver(){
         this.setState({
@@ -20,14 +24,6 @@ default React.createClass({
     mouseLeave(){
         this.setState({
             hover: false
-        });
-    },
-    getEvents(){
-        var date = moment(this.props.date, 'YYYY-MM-DD');
-        return AgendaEvents.events.filter(function(event){
-            return date.isBetween(event.startDate, event.endDate, 'day') ||
-                date.isSame(event.startDate, 'day') ||
-                date.isSame(event.endDate, 'day');
         });
     },
     /**
@@ -59,7 +55,7 @@ default React.createClass({
     render() {
         var date = moment(this.props.date, 'YYYY-MM-DD');
         var monthMM = moment(this.props.viewMonth, 'YYYY-MM-DD');
-
+        var events = AgendaEvents.getEvents(date);
         var classes = classNames('cal-month-day', {
             'cal-day-inmonth': date.get('month') === monthMM.get('month'),
             'cal-day-outmonth': date.get('month') !== monthMM.get('month')
@@ -68,14 +64,14 @@ default React.createClass({
         });
         return (
             <div className="cal-cell1 cal-cell" onMouseOver={this.mouseOver}
-                onMouseLeave={this.mouseLeave}>
+                onMouseLeave={this.mouseLeave} onClick={this.onClick}>
                 <div className={classes} >
                     <span className="pull-right" data-cal-date>{date.date()}</span>
                     {this.props.focusWeek ? this.renderWeekBox() : null}
                     <div className="events-list">
-                        {this.getEvents().map(this.renderEvent)}
+                        {events.map(this.renderEvent)}
                     </div>
-                    {this.state.hover && this.getEvents().length > 0 ? this.renderDayTick() : null}
+                    {this.state.hover && events.length > 0 ? this.renderDayTick() : null}
                 </div>
             </div>
         );
