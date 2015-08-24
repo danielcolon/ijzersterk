@@ -13,13 +13,12 @@ import About from './views/About.jsx';
 import Login from './components/Login.jsx';
 
 var {
-    Route, RouteHandler, DefaultRoute
+    Route, RouteHandler, DefaultRoute, NotFoundRoute
 } = Router;
 window.React = React;
 
 // The app component the root components of all other components.
 var App = React.createClass({
-
     render() {
         return (<div>
                 <Header/>
@@ -43,8 +42,8 @@ var UnderConstruction = React.createClass({
 // So going to domain.com/#/home will load the Home component.
 var routes = (
     <Route path="/" handler={App}>
-        <DefaultRoute handler={Home}/>
-        <Route name="home" handler={Home}/>
+        <DefaultRoute name="home" handler={Home}/>
+        <NotFoundRoute handler={Home}/>
         <Route name="blogs" handler={Blogs}/>
         <Route name="agenda" handler={UnderConstruction}/>
         <Route name="newmember" handler={Newmember}/>
