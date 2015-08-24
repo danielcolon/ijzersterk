@@ -9,8 +9,7 @@ export
 default React.createClass({
     getInitialState(){
         return {
-            hover: false,
-            displayEvents: false
+            hover: false
         };
     },
     onClick(){
@@ -47,25 +46,46 @@ default React.createClass({
         var classes = classNames('pull-left', 'event', 'event-' + style);
 
         return <OverlayTrigger key={index} placement='top'
-                overlay={tooltip}>
-                    <div data-event-class={'event-' + {style}} className={classes}>
-                </div>
-            </OverlayTrigger>;
+                overlay={tooltip}
+                onMouseOver={this.props.toggleFocusEvent.bind(null, event, true)}>
+                    <div onMouseLeave={this.props.toggleFocusEvent.bind(null, event, false)}
+                         data-event-class={'event-' + {style}}
+                         className={classes}>
+                    </div>
+                </OverlayTrigger>;
+    },
+    getCSSClasses(date, events){
+        var monthMM = moment(this.props.viewMonth, 'YYYY-MM-DD');
+        var focusEvent;
+
+        if (this.props.focusEvent !== null) {
+            focusEvent = _.find(events, {
+                id: this.props.focusEvent
+            });
+        }
+
+        var classes = classNames('cal-month-day', {
+            'cal-day-inmonth': date.get('month') === monthMM.get('month'),
+            'cal-day-outmonth': date.get('month') !== monthMM.get('month'),
+            'cal-day-weekend': date.get('day') === 0 || date.get('day') === 6,
+            'day-highlight': focusEvent !== undefined
+        });
+
+        if (focusEvent !== undefined) {
+            var eventStyle = _.find(AgendaEvents.types, {
+                type: focusEvent.type
+            }).style;
+            classes += ` dh-event-${eventStyle}`;
+        }
+        return classes;
     },
     render() {
         var date = moment(this.props.date, 'YYYY-MM-DD');
-        var monthMM = moment(this.props.viewMonth, 'YYYY-MM-DD');
         var events = AgendaEvents.getEvents(date);
-        var classes = classNames('cal-month-day', {
-            'cal-day-inmonth': date.get('month') === monthMM.get('month'),
-            'cal-day-outmonth': date.get('month') !== monthMM.get('month')
-        }, {
-            'cal-day-weekend': date.get('day') === 0 || date.get('day') === 6
-        });
         return (
             <div className="cal-cell1 cal-cell" onMouseOver={this.mouseOver}
                 onMouseLeave={this.mouseLeave} onClick={this.onClick}>
-                <div className={classes} >
+                <div className={this.getCSSClasses(date, events)} >
                     <span className="pull-right" data-cal-date>{date.date()}</span>
                     {this.props.focusWeek ? this.renderWeekBox() : null}
                     <div className="events-list">

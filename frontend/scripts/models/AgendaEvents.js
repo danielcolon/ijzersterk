@@ -1,5 +1,6 @@
 var AgendaEvents = {
     events:[{
+        id: 1,
         type: 'training',
         startDate: '2015-10-09T14:00',
         endDate: '2015-10-09T15:00',
@@ -11,6 +12,7 @@ var AgendaEvents = {
             name: 'Daniel'
         }]
     },{
+        id: 2,
         type: 'training',
         startDate: '2015-10-02T14:00',
         endDate: '2015-10-02T20:00',
@@ -28,6 +30,7 @@ var AgendaEvents = {
             name: 'Maikel'
         }]
     },{
+        id: 3,
         type: 'social',
         startDate: '2015-10-20T10:00',
         endDate: '2015-10-20T24:00',
@@ -45,6 +48,7 @@ var AgendaEvents = {
             name: 'Maikel'
         }]
     },{
+        id: 4,
         type: 'social',
         startDate: '2015-10-13T12:00',
         endDate: '2015-10-20T18:00',
@@ -54,6 +58,7 @@ var AgendaEvents = {
             name: 'Auke'
         }]
     },{
+        id: 5,
         type: 'training',
         startDate: '2015-10-09T14:00',
         endDate: '2015-10-09T15:00',
