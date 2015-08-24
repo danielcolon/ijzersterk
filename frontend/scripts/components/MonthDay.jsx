@@ -7,6 +7,9 @@ import {
 }
 from 'react-bootstrap';
 import _ from 'lodash';
+import WeekBox from './WeekBox.jsx';
+import DayTick from './DayTick.jsx';
+import EventCircle from './EventCircle.jsx';
 
 export
 default React.createClass({
@@ -28,33 +31,17 @@ default React.createClass({
             hover: false
         });
     },
-    /**
-     * Creates a week box. Which shows which week is being focused.
-     * @return {React.div}
-     */
-    renderWeekBox() {
-        return (<div id="cal-week-box" data-cal-week="">Week {this.props.date.format('W')}</div>);
-    },
-    renderDayTick() {
-        return (<div id="cal-day-tick">
-                    <span className="glyphicon glyphicon-chevron-down"></span>
-                </div>);
-    },
     renderEvent(event, index) {
-        var tooltip = (<Tooltip>{event.title}</Tooltip>);
-        var style = _.find(AgendaEvents.types, {
-            type: event.type
-        }).style;
-        var classes = classNames('pull-left', 'event', 'event-' + style);
-
-        return <OverlayTrigger key={index} placement='top'
-                overlay={tooltip}
-                onMouseOver={this.props.toggleFocusEvent.bind(null, event, true)}>
-                    <div onMouseLeave={this.props.toggleFocusEvent.bind(null, event, false)}
-                         data-event-class={'event-' + {style}}
-                         className={classes}>
-                    </div>
-                </OverlayTrigger>;
+        const tooltip = (<Tooltip>{event.title}</Tooltip>);
+        return <OverlayTrigger
+                    onMouseOver={this.props.toggleFocusEvent.bind(null, event, true)}
+                    key={index}
+                    placement='top'
+                    overlay={tooltip}>
+                <EventCircle
+                    onMouseLeave={this.props.toggleFocusEvent.bind(null, event, false)}
+                    event={event}/>
+            </OverlayTrigger>;
     },
     getCSSClasses(date, events) {
         var monthMM = moment(this.props.viewMonth, 'YYYY-MM-DD');
@@ -88,11 +75,9 @@ default React.createClass({
                 onMouseLeave={this.mouseLeave} onClick={this.onClick}>
                 <div className={this.getCSSClasses(this.props.date, events)} >
                     <span className="pull-right" data-cal-date>{this.props.date.date()}</span>
-                    {this.props.focusWeek ? this.renderWeekBox() : null}
-                    <div className="events-list">
-                        {events.map(this.renderEvent)}
-                    </div>
-                    {this.state.hover && events.length > 0 ? this.renderDayTick() : null}
+                    <WeekBox date={this.props.date} visible={this.props.focusWeek}/>
+                    <div className="events-list">{events.map(this.renderEvent)}</div>
+                    <DayTick visible={this.state.hover && events.length > 0}/>
                 </div>
             </div>
         );

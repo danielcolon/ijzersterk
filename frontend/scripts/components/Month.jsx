@@ -3,7 +3,7 @@ import moment from 'moment';
 import MonthDay from './MonthDay.jsx';
 import _ from 'lodash';
 import AgendaEvents from '../models/AgendaEvents.js';
-import classNames from 'classnames';
+import SlideBox from './SlideBox.jsx';
 
 /**
  * Gets the fist visible day of the month calendar.
@@ -74,44 +74,6 @@ default React.createClass({
         });
     },
     /**
-     * Renders the slide box when clicking on a day.
-     * @param  {Number} dayIndex The n-th day that was on clicked.
-     * @param  {Array} events   The array of events for that day.
-     * @return {React.component} A cal-slide-box div.
-     */
-    renderSlideBox(dayIndex, events){
-        var $self = this;
-
-        var renderEvent = function(event, index){
-            var style = _.find(AgendaEvents.types, {
-                type: event.type
-            }).style;
-            var classes = classNames('pull-left', 'event', 'event-' + style);
-
-            return (<li key={index}>
-                        <span className={classes}></span>&nbsp;
-                        <a href="#" data-event-id
-                        onMouseOver={$self.toggleFocusEvent.bind(null, event, true)}
-                        onMouseLeave={$self.toggleFocusEvent.bind(null, event, false)}
-                            data-event-class={'event-' + style} className="event-item">
-                            {event.title}
-                        </a>
-                    </li>);
-        };
-
-        var tickDay = 'tick-day' + (dayIndex + 1);
-        return (
-                <div id="cal-slide-box" key="cal-slide">
-                    <span id="cal-slide-tick" className={tickDay}></span>
-                    <div id="cal-slide-content" className="cal-event-list">
-                        <ul className="unstyled list-unstyled">
-                            {events.map(renderEvent)}
-                        </ul>
-                    </div>
-                </div>
-        );
-    },
-    /**
      * Renders a week in the month.
      * @param  {Array} days  An array of MonthDay components.
      * @return {React.component}       A React component to be rendered.
@@ -126,7 +88,8 @@ default React.createClass({
 
             if (dayIndex !== -1) {
                 var events = AgendaEvents.getEvents(this.state.focusDay, 'YYYY-MM-DD');
-                slideBox = this.renderSlideBox(dayIndex, events);
+                slideBox = <SlideBox toggleFocusEvent={this.toggleFocusEvent}
+                    events={events} dayIndex={dayIndex}/>;
             }
         }
         return (
