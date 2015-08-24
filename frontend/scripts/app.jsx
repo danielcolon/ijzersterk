@@ -1,7 +1,6 @@
 /**
  * The starting point of the JavaScript in the website.
  */
-
 import React from 'react';
 import Router from 'react-router';
 import Header from './views/Header.jsx';

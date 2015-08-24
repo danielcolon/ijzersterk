@@ -1,33 +1,60 @@
 import React from 'react';
 import moment from 'moment';
 import Month from './Month.jsx';
+import classNames from 'classnames';
+import Day from './Day.jsx';
 
 export
 default React.createClass({
     getInitialState() {
         return {
-            date: moment()
+            date: moment(),
+            view: 'month'
         };
     },
-    renderWeekCell(week, index){
-        return <div key={index} className="cal-cell1">{week}</div>;
-    },
-    prevMonth(){
+    prevMonth() {
         this.setState({
             date: this.state.date.add(-1, 'month')
         });
     },
-    nextMonth(){
+    nextMonth() {
         this.setState({
             date: this.state.date.add(1, 'month')
         });
     },
-    resetDate(){
+    resetDate() {
         this.setState({
             date: moment()
         });
     },
+    toggleView(view, date) {
+        this.setState({
+            view: view,
+            date: date
+        });
+    },
+    renderView() {
+        if (this.state.view === 'month') {
+            return <Month key={2}
+                date={this.state.date}
+                toggleView={this.toggleView}></Month>;
+        } else if (this.state.view === 'day') {
+            return <Day key={2} date={this.state.date}></Day>;
+        }
+    },
+    renderDate() {
+        if (this.state.view === 'month') {
+            return this.state.date.format('MMMM YYYY');
+        }
+        return this.state.date.format('dddd MMMM YYYY');
+    },
     render() {
+        var monthClasses = classNames('btn', 'btn-warning', {
+            'active': this.state.view === 'month'
+        });
+        var dayClasses = classNames('btn', 'btn-warning', {
+            'active': this.state.view === 'day'
+        });
         return (
             <div>
                 <div className="page-header">
@@ -38,19 +65,22 @@ default React.createClass({
                             <button className="btn btn-primary" onClick={this.nextMonth}>Next &gt;&gt;</button>
                         </div>
                         <div className="btn-group">
-                            <button className="btn btn-warning active">Month</button>
-                            <button className="btn btn-warning">Day</button>
+                            <button className={monthClasses}
+                                onClick={this.toggleView.bind(null, 'month', this.state.date)}>
+                                    Month
+                            </button>
+                            <button className={dayClasses}
+                                onClick={this.toggleView.bind(null, 'day', this.state.date)}>
+                                Day
+                            </button>
                         </div>
                     </span>
-                    <h3>{this.state.date.format('MMMM YYYY')}</h3>
+                    <h3>{this.renderDate()}</h3>
                 </div>
                 <div className="row">
                     <div className="col-md-10">
                         <div className="cal-context">
-                            <div key={1} className="cal-row-fluid cal-row-head">
-                                {moment.weekdays().map(this.renderWeekCell)}
-                            </div>
-                            <Month key={2} date={this.state.date.format('YYYY-MM-DD')}></Month>
+                            {this.renderView()}
                         </div>
                     </div>
                 </div>

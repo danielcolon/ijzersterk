@@ -2,25 +2,28 @@ import React from 'react';
 import moment from 'moment';
 import classNames from 'classnames';
 import AgendaEvents from '../models/AgendaEvents.js';
-import {Tooltip, OverlayTrigger} from 'react-bootstrap';
+import {
+    Tooltip, OverlayTrigger
+}
+from 'react-bootstrap';
 import _ from 'lodash';
 
 export
 default React.createClass({
-    getInitialState(){
+    getInitialState() {
         return {
             hover: false
         };
     },
-    onClick(){
+    onClick() {
         this.props.onDayClick(this.props.date);
     },
-    mouseOver(){
+    mouseOver() {
         this.setState({
             hover: true
         });
     },
-    mouseLeave(){
+    mouseLeave() {
         this.setState({
             hover: false
         });
@@ -29,16 +32,15 @@ default React.createClass({
      * Creates a week box. Which shows which week is being focused.
      * @return {React.div}
      */
-    renderWeekBox(){
-        var date = moment(this.props.date, 'YYYY-MM-DD');
-        return (<div id="cal-week-box" data-cal-week>Week {date.format('W')}</div>);
+    renderWeekBox() {
+        return (<div id="cal-week-box" data-cal-week="">Week {this.props.date.format('W')}</div>);
     },
-    renderDayTick(){
+    renderDayTick() {
         return (<div id="cal-day-tick">
                     <span className="glyphicon glyphicon-chevron-down"></span>
                 </div>);
     },
-    renderEvent(event, index){
+    renderEvent(event, index) {
         var tooltip = (<Tooltip>{event.title}</Tooltip>);
         var style = _.find(AgendaEvents.types, {
             type: event.type
@@ -54,7 +56,7 @@ default React.createClass({
                     </div>
                 </OverlayTrigger>;
     },
-    getCSSClasses(date, events){
+    getCSSClasses(date, events) {
         var monthMM = moment(this.props.viewMonth, 'YYYY-MM-DD');
         var focusEvent;
 
@@ -80,13 +82,12 @@ default React.createClass({
         return classes;
     },
     render() {
-        var date = moment(this.props.date, 'YYYY-MM-DD');
-        var events = AgendaEvents.getEvents(date);
+        var events = AgendaEvents.getEvents(this.props.date);
         return (
             <div className="cal-cell1 cal-cell" onMouseOver={this.mouseOver}
                 onMouseLeave={this.mouseLeave} onClick={this.onClick}>
-                <div className={this.getCSSClasses(date, events)} >
-                    <span className="pull-right" data-cal-date>{date.date()}</span>
+                <div className={this.getCSSClasses(this.props.date, events)} >
+                    <span className="pull-right" data-cal-date>{this.props.date.date()}</span>
                     {this.props.focusWeek ? this.renderWeekBox() : null}
                     <div className="events-list">
                         {events.map(this.renderEvent)}

@@ -45,9 +45,9 @@ default React.createClass({
      * @param  {String} date The date which was clicked on in YYYY-MM-DD format.
      */
     onDayClick(date){
-        var mmDate = moment(date, 'YYYY-MM-DD');
-        var events = AgendaEvents.getEvents(mmDate);
-        if (events.length === 0 || this.state.focusDay === date) {
+        var events = AgendaEvents.getEvents(date);
+        if (events.length === 0 ||
+            (this.state.focusDay !== null && this.state.focusDay.isSame(date, 'day'))) {
             this.setState({
                 focusDay: null
             });
@@ -121,11 +121,11 @@ default React.createClass({
         if (this.state.focusDay !== null) {
             var $self = this;
             var dayIndex = _.findIndex(days, function(day) {
-                return day.props.date === $self.state.focusDay;
+                return day.props.date.isSame($self.state.focusDay, 'day');
             });
 
             if (dayIndex !== -1) {
-                var events = AgendaEvents.getEvents(moment(this.state.focusDay, 'YYYY-MM-DD'));
+                var events = AgendaEvents.getEvents(this.state.focusDay, 'YYYY-MM-DD');
                 slideBox = this.renderSlideBox(dayIndex, events);
             }
         }
@@ -144,17 +144,16 @@ default React.createClass({
      * @return {React.component} A calendar month to be rendered.
      */
     renderMonth() {
-        let current = getFirst(moment(this.props.date, 'YYYY-MM-DD'));
-        let end = getLast(moment(this.props.date, 'YYYY-MM-DD'));
+        let current = getFirst(this.props.date.clone());
+        let end = getLast(this.props.date.clone());
         let weeks = [];
-
         while (current.isBefore(end)) {
             var focus = weeks.length % 7 === 0
                 && current.format('W') === this.state.focusWeek;
 
             weeks.push(<MonthDay
                 key={current.format('DD-MM')}
-                date={current.format('YYYY-MM-DD')}
+                date={current.clone()}
                 viewMonth={this.props.date}
                 focusWeek={focus}
                 focusEvent={this.state.focusEvent}
@@ -170,7 +169,15 @@ default React.createClass({
             .map(this.renderWeek)
             .value();
     },
+    renderWeekCell(week, index){
+        return <div key={index} className="cal-cell1">{week}</div>;
+    },
     render() {
-        return <div className="cal-month-box">{this.renderMonth()}</div>;
+        return <div>
+                <div key={1} className="cal-row-fluid cal-row-head">
+                    {moment.weekdays().map(this.renderWeekCell)}
+                </div>
+                <div className="cal-month-box">{this.renderMonth()}</div>
+            </div>;
     }
 });
