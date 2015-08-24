@@ -11,9 +11,9 @@ default React.createClass({
             <div className="block">
                 <h4>News</h4>
                 <ul>
-                    <li><Link to="blogs">New website is finally live</Link></li>
-                    <li><Link to="blogs">Newsletter #2</Link></li>
-                    <li><Link to="blogs">Sterkste Student(e) van Delft</Link></li>
+                    <li><Link to="/blogs#website-live">New website is finally live</Link></li>
+                    <li><Link to="/blogs#newsletter2">Newsletter #2</Link></li>
+                    <li><Link to="/blogs#sterkstestudent2015">Sterkste Student(e) van Delft</Link></li>
                 </ul>
             </div>
             <div className="block">

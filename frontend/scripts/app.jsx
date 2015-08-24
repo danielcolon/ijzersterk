@@ -12,12 +12,15 @@ import Newmember from './views/Newmember.jsx';
 import About from './views/About.jsx';
 import Login from './components/Login.jsx';
 
-var { Route, RouteHandler, DefaultRoute } = Router;
+var {
+    Route, RouteHandler, DefaultRoute
+} = Router;
 window.React = React;
 
 // The app component the root components of all other components.
 var App = React.createClass({
-    render(){
+
+    render() {
         return (<div>
                 <Header/>
                 <div className="container">
@@ -31,7 +34,7 @@ var App = React.createClass({
 });
 
 var UnderConstruction = React.createClass({
-    render(){
+    render() {
         return <h1>UNDER CONSTRUCTION</h1>;
     }
 });
@@ -50,7 +53,33 @@ var routes = (
     </Route>
 );
 
-// Inject the routes into the root component.
-Router.run(routes, function(Handler){
+// Set the options for the router
+var router = Router.create({
+    routes: routes,
+    location: Router.HashLocation,
+    scrollBehavior: {
+        /**
+         * Sets the behaviour for scrolling when changing state.
+         * If there is a second hash in the url, scroll to the element with matching identifier.
+         * Otherwise scroll to the top.
+         * @override
+         */
+        updateScrollPosition: function updateScrollPosition() {
+            window.location.hash = window.decodeURIComponent(window.location.hash);
+            const hashParts = window.location.hash.split('#');
+            if (hashParts.length > 2) {
+                const hash = hashParts.slice(-1)[0];
+                const element = document.querySelector(`#${hash}`);
+                if (element) {
+                    element.scrollIntoView();
+                }
+            } else {
+                window.scrollTo(0, 0);
+            }
+        }
+    }
+});
+
+router.run(function(Handler) {
     React.render(<Handler/>, document.getElementById('react'));
 });
