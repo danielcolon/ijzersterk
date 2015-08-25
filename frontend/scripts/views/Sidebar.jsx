@@ -18,7 +18,13 @@ default React.createClass({
             </div>
             <div className="block">
                 <h4>Blogs</h4>
-                <span className="soon">Coming soon</span>
+                <ul>
+                    <li>
+                        <Link to="/blogs#ego-lifting">
+                            Ego lifting - The bad, the ugly and the good
+                        </Link>
+                    </li>
+                </ul>
             </div>
             <div className="block">
                 <h4>Agenda</h4>
