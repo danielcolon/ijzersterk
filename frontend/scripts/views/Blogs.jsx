@@ -7,7 +7,7 @@ default React.createClass({
             <div className="col-md-10 col-md-offset-1 col-xs-12">
                 <div id="website-live" className="article">
                     <h1>New website is live!</h1>
-                    <div className="date">July 22, 2015 | <span className="name">Pouja</span></div>
+                    <div className="date">August 23, 2015 | <span className="name">Pouja</span></div>
                     <p>Our new website with the new logo is live. We worked hard together with <a href="http://www.zokodesign.com">Zoko</a> to set up the new lay out of the website. Zoko also made the new logos:</p>
                     <div className="row">
                         <div className="col-md-5 col-xs-12">
