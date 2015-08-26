@@ -2,6 +2,8 @@
 
 var gulp = require('gulp');
 
+var npmPackage = require('./package.json');
+
 // Parses less files to css files
 var less = require('gulp-less');
 
@@ -44,7 +46,9 @@ var postcss = require('gulp-postcss');
 // Optimize PNG, JPG, GIF, SVG images
 var image = require('gulp-image');
 
+var runSequence = require('run-sequence');
 var csso = require('gulp-csso');
+var zip = require('gulp-zip');
 
 var reload = browserSync.reload;
 var config = {
@@ -142,6 +146,12 @@ gulp.task('lint', function() {
         .pipe(eslint.format());
 });
 
+gulp.task('zip', function(){
+    return gulp.src('dist/**')
+        .pipe(zip('dist-' + npmPackage.version + '.zip'))
+        .pipe(gulp.dest('.'));
+});
+
 gulp.task('watchTask', function() {
     gulp.watch('index.html', ['html-copy']);
     gulp.watch(config.less, ['styles']);
@@ -152,9 +162,9 @@ gulp.task('watch', ['clean'], function() {
     gulp.start(['browserSync', 'watchTask', 'watchify', 'html-copy', 'styles', 'lint', 'image']);
 });
 
-gulp.task('build', ['clean'], function() {
+gulp.task('build', ['clean'], function(cb) {
     process.env.NODE_ENV = 'production';
-    gulp.start(['browserify', 'styles', 'html-copy', 'image']);
+    runSequence(['browserify', 'styles', 'html-copy', 'image'], 'zip', cb);
 });
 
 gulp.task('default', function() {
