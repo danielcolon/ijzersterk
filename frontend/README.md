@@ -12,4 +12,5 @@ Anyway, use `gulp watch` to start the front-end, it will then auto-watch all the
 
 # Deploy
 To deploy the website: `gulp build`.
-It will create a `dist` directory which is deployable.
+It will create a `dist` directory  which is deployable and be can run independant.  
+You can also use `gulp deploy` that will create only a zip file which is deployable.

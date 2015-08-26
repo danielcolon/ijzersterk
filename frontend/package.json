@@ -51,5 +51,9 @@
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.2.2"
+  },
+  "devDependencies": {
+    "gulp-zip": "^3.0.2",
+    "run-sequence": "^1.1.2"
   }
 }
