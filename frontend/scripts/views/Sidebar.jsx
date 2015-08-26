@@ -21,7 +21,7 @@ default React.createClass({
                 <ul>
                     <li>
                         <Link to="/blogs#ego-lifting">
-                            Ego lifting - The bad, the ugly and the good
+                            Ego lifting - The good, the bad and the ugly
                         </Link>
                     </li>
                 </ul>
