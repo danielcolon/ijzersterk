@@ -9,20 +9,17 @@ default React.createClass({
                     <h1>Ego lifting</h1>
                     <div className="date">August 26, 2015 | <span className="name">Pouja</span> | 3 min read</div>
                     <p>Ego lifting is one of the most commonly made mistakes in beginning and intermediate strength sport athletes, almost all lifters will let their ego interfere with their training at some point. What exactly is ego lifting? Is it really so bad? And how can I avoid it?</p>
-
                     <h4>The ugly</h4>
                     <p>
                         <div className="row">
-
                             <div className="col-md-8 col-xs-12">Ego lifting is going too heavy or wanting too much out of every training, which leads to bad form, injuries and stagnation in training. You are lifting more than you should, to satisfy your ego. For example: you are following a training program where you are required to deadlift 3 sets of 3 repetitions at 80% of your one-rep max. Instead of doing this 80% you do 90% or 100%, you push yourself to the limit, without considering your program or the basic principles of any strength sport, such as progressive overload.<br/>
-                            Or you felt good that day, or you want to impress that hot chick or boy that came and cranked out two more quarter repetitions, that is ego lifting.<br/>
-                            But ego lifting can also be that you stay oblivious over the fact that your form is bad. Or you do not need to eat that, or research that. In a sense it is lifting without thinking, it is a workout.
+                            Ego lifting can also lead to less reflection on your lift, you keep using bad form. In a sense it is lifting without thinking, it is a workout.
                             </div>
                             <div className="col-md-4 col-xs-12">
                                 <div className="thumbnail">
                                     <img src="http://body-builderz.com/wp-content/uploads/deadlift-in-high-heels.png?1469b1"/>
                                     <div className="caption">
-                                        A good example of ego lifting. <a href="https://www.youtube.com/watch?v=aWsVnE2854I">This women tried to deadlift in heels, which ended ugly.</a>
+                                        A good example of ego lifting. <a href="https://www.youtube.com/watch?v=aWsVnE2854I">This woman tried to deadlift in heels, which ended ugly.</a>
                                     </div>
                                 </div>
                             </div>
@@ -30,12 +27,11 @@ default React.createClass({
                     </p>
 
                     <h4>The good</h4>
-                    <p>But, there can be times that it is a good thing. An anecdote example is that I decided to screw my training on that day and go nuts on the deadlift and max out. I broke my plateau and gained a lot of confidence in my deadlift that resulted in hitting 210 kg for two repetitions two week after that. Which I probably would not have been able to if I did not go crazy that day.</p>
+                    <p>But, there can be times that ego lifting is a good thing. An anecdote example is that I decided to screw my training on that day and go nuts on the deadlift and max out. I broke my plateau and gained a lot of confidence in my deadlift that resulted in hitting 210 kg for two repetitions two week after that. Which I probably would not have been able to if I did not go crazy that day.</p>
 
                     <h4>The bad</h4>
                     <p>So going crazy and not respecting form or the training cycle can benefit your confidence or you can even learn a new thing, but that is a workout not a training. It is a rare exception that it went well, I could have injured myself.
-                        Reason I call it a workout is because I was not improving my form nor my volume nor my anything except maybe my ego. Each session you spend in the gym, is a training session. Training to reach that goal you have set, that six plate deadlift, that two plate bench, that body you have always dreamed. You achieve that by perfecting form and by doing progressieve overload. You are not improving your form when you are maxing out each session, you are not improving when you injury yourself, you are not improving efficiently when you are lifting with bad form.</p>
-
+                        Reason I called it a workout is because I was not improving my form nor my volume nor my anything except for maybe my ego. Each session you spend in the gym, is a training session. Training to reach that goal you have set, that six plate deadlift, that two plate bench, that body you have always dreamed of. You achieve that by perfecting form and by doing progressieve overload. You are not improving your form when you are maxing out every each session, you are not improving when you injury yourself, you are not improving efficiently when you are lifting with bad form.</p>
                     <p>My concluding words are: <br/>
                     <i>&#8220;Keep your ego in check and lift with your head&#8222;</i>
                     </p>
