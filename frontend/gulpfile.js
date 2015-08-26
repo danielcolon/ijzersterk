@@ -2,6 +2,8 @@
 
 var gulp = require('gulp');
 
+var npmPackage = require('./package.json');
+
 // Parses less files to css files
 var less = require('gulp-less');
 
@@ -44,7 +46,9 @@ var postcss = require('gulp-postcss');
 // Optimize PNG, JPG, GIF, SVG images
 var image = require('gulp-image');
 
+var runSequence = require('run-sequence');
 var csso = require('gulp-csso');
+var zip = require('gulp-zip');
 
 var reload = browserSync.reload;
 var config = {
@@ -121,6 +125,7 @@ gulp.task('styles', function() {
         }));
 });
 
+// Copies all the html files to the dist directory
 gulp.task('html-copy', function() {
     return gulp.src('index.html')
         .pipe(gulp.dest(config.distHtml))
@@ -129,6 +134,7 @@ gulp.task('html-copy', function() {
         }));
 });
 
+// Copies all the files under img/ to the dist/img directory
 gulp.task('image', function() {
     return gulp.src('img/**')
         .pipe(image())
@@ -142,20 +148,38 @@ gulp.task('lint', function() {
         .pipe(eslint.format());
 });
 
+// Creates a zip file of the dist directory
+gulp.task('zip', function(){
+    return gulp.src('dist/**')
+        .pipe(zip('dist-' + npmPackage.version + '.zip'))
+        .pipe(gulp.dest('.'));
+});
+
+// Defines which directories/files should be watched for changes (first argument)
+// Second argument defines which task should be run when a change occurs.
 gulp.task('watchTask', function() {
     gulp.watch('index.html', ['html-copy']);
     gulp.watch(config.less, ['styles']);
     gulp.watch('scripts/**/*.jsx', ['lint']);
 });
 
+// The watch task.
+// Copies the html/img files, watches for changes and sets up the automatic building of jsx files
 gulp.task('watch', ['clean'], function() {
     gulp.start(['browserSync', 'watchTask', 'watchify', 'html-copy', 'styles', 'lint', 'image']);
 });
 
+// Creates a dist directory which can be run indepedant
 gulp.task('build', ['clean'], function() {
     process.env.NODE_ENV = 'production';
-    gulp.start(['browserify', 'styles', 'html-copy', 'image']);
+    gulp.start('browserify', 'styles', 'html-copy', 'image');
 });
+
+// Creates a zip file which is deployable
+gulp.task('deploy', function(cb){
+    process.env.NODE_ENV = 'production';
+    runSequence('clean', ['browserify', 'styles', 'html-copy', 'image'], 'zip', 'clean', cb);
+})
 
 gulp.task('default', function() {
     console.log('Run "gulp watch or gulp build"');
