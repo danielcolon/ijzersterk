@@ -12,14 +12,14 @@ default React.createClass({
             view: 'month'
         };
     },
-    prevMonth() {
+    prev() {
         this.setState({
-            date: this.state.date.add(-1, 'month')
+            date: this.state.date.add(-1, this.state.view)
         });
     },
-    nextMonth() {
+    next() {
         this.setState({
-            date: this.state.date.add(1, 'month')
+            date: this.state.date.add(1, this.state.view)
         });
     },
     resetDate() {
@@ -46,7 +46,7 @@ default React.createClass({
         if (this.state.view === 'month') {
             return this.state.date.format('MMMM YYYY');
         }
-        return this.state.date.format('dddd MMMM YYYY');
+        return this.state.date.format('dddd DD MMMM, YYYY');
     },
     render() {
         var monthClasses = classNames('btn', 'btn-warning', {
@@ -56,13 +56,13 @@ default React.createClass({
             'active': this.state.view === 'day'
         });
         return (
-            <div>
+            <div id="calendar">
                 <div className="page-header">
                     <span className="pull-right form-inline">
                         <div className="btn-group">
-                            <button className="btn btn-primary" onClick={this.prevMonth}>&lt;&lt; Prev</button>
+                            <button className="btn btn-primary" onClick={this.prev}>&lt;&lt; Prev</button>
                             <button className="btn btn-primary" onClick={this.resetDate}>Today</button>
-                            <button className="btn btn-primary" onClick={this.nextMonth}>Next &gt;&gt;</button>
+                            <button className="btn btn-primary" onClick={this.next}>Next &gt;&gt;</button>
                         </div>
                         <div className="btn-group">
                             <button className={monthClasses}
