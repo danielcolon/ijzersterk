@@ -6,6 +6,9 @@ from 'react-router';
 
 export
 default React.createClass({
+    shouldComponentUpdate() {
+        return false;
+    },
     render() {
         return (<div className="col-md-3 col-xs-12 sidebar">
             <div className="block">

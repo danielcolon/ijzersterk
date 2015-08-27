@@ -2,6 +2,9 @@ import React from 'react';
 
 export
 default React.createClass({
+    shouldComponentUpdate() {
+        return false;
+    },
     render() {
         return (
             <div className="col-md-10 col-md-offset-1 col-xs-12">

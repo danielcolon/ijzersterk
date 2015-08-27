@@ -1,8 +1,15 @@
 import React from 'react';
-import {Link} from 'react-router';
+import {
+    Link
+}
+from 'react-router';
 
-export default React.createClass({
-    render(){
+export
+default React.createClass({
+    shouldComponentUpdate() {
+        return false;
+    },
+    render() {
         return (<div className="col-md-10 col-md-offset-1 col-xs-12">
           <h1>The association</h1>
           <div className="subheader">DSVK IJzersterk</div>

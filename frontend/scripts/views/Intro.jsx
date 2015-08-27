@@ -3,6 +3,9 @@ import {Link} from 'react-router';
 
 export
 default React.createClass({
+    shouldComponentUpdate() {
+        return false;
+    },
     render() {
         return (<div className="col-md-7 col-md-offset-1 main">
                     <h1>DSKV IJzersterk</h1>

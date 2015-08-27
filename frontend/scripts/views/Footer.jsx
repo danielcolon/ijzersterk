@@ -2,6 +2,9 @@ import React from 'react';
 
 export
 default React.createClass({
+    shouldComponentUpdate() {
+        return false;
+    },
     render() {
         return (<footer className="footer">
                     <div className="container">
