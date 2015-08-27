@@ -35,26 +35,23 @@ class user
 
 	function getLastLogin()
 	{
-		if(isset($this->lastLogin))
-		{
-			return $this->lastLogin;
-		}
-		else
-		{
-			return null;
-		}
+		return $this->lastLogin;
 	}
 
-	function getLastLoginAsString()
+	function getLastLoginAsString($AsUTC = FALSE)
 	{
-		if(isset($this->lastLogin))
+		// First check if it's even set
+		if(is_null($this->getLastLogin()))
 		{
-			return $this->getLastLogin()->format('Y-m-d H:i:s');
+			return NULL;
 		}
-		else
+
+		if($AsUTC && !is_null($this->getLastLogin()))
 		{
-			return null;
+			return $this->getLastLogin()->format(DateTime::ISO8601);
 		}
+		// Default is for SQL
+		return $this->getLastLogin()->format('Y-m-d H:i:s');
 	}
 
 	function getLastLoginIP()
@@ -64,17 +61,22 @@ class user
 
 	function getCreated()
 	{
-		// Check if we just got created
-		if(!isset($this->created))
-		{
-			// If so, return now
-			return new DateTime;
-		}
 		return $this->created;
 	}
 
-	function getCreatedAsString()
+	function getCreatedAsString($AsUTC = FALSE)
 	{
+		// First check if it's even set
+		if(is_null($this->getCreated()))
+		{
+			return NULL;
+		}
+
+		if($AsUTC && !is_null($this->getCreated()))
+		{
+			return $this->getCreated()->format(DateTime::ISO8601);
+		}
+		// Default is for SQL
 		return $this->getCreated()->format('Y-m-d H:i:s');
 	}
 
@@ -123,9 +125,9 @@ class user
 		return array(
 			"id"          => $this->getId(),
 			"username"    => $this->getUserName(),
-			"lastLogin"   => $this->getLastLoginAsString(),
+			"lastLogin"   => $this->getLastLoginAsString(true),
 			"lastLoginIP" => $this->getLastLoginIP(),
-			"created"     => $this->getCreatedAsString(),
+			"created"     => $this->getCreatedAsString(true),
 			"isAdmin"     => $this->getIsAdmin(),
 			"firstName"   => $this->getFirstName(),
 			"lastName"    => $this->getLastName(),
@@ -152,6 +154,7 @@ class user
 		{
 			if($ALastLogin == "0000-00-00 00:00:00")
 			{
+				// SQL returns this if a DateTime is null. So unset.
 				unset($this->lastLogin);
 			}
 			else
@@ -184,6 +187,7 @@ class user
 		{
 			if($ACreated == "0000-00-00 00:00:00")
 			{
+				// SQL returns this if a DateTime is null. So unset.
 				unset($this->created);
 			}
 			else
@@ -193,7 +197,7 @@ class user
 		}
 		else
 		{
-			$this->created = $ALastLogin;
+			$this->created = $ACreated;
 		}
 		$this->isChanged = TRUE;
 	}
@@ -254,7 +258,7 @@ class user
 		if(!is_null($AUsername) && !is_null($APassword))
 		{
 			$dirname = dirname(__FILE__);
-			require("$dirname/database.php");
+			require_once("$dirname/database.php");
 			$DBTable  = 'users';
 
 			//Connect to database
@@ -274,12 +278,7 @@ class user
 			$this->setUsername($AUsername);
 			if($this->fill($database))
 			{
-				if($this->checkPassword($APassword))
-				{
-					$database->disconnect();
-					return true;
-				}
-				else
+				if(!$this->checkPassword($APassword))
 				{
 					trigger_error("Invalid password supplied for username: $AUsername", E_USER_NOTICE);
 					$database->disconnect();
@@ -293,6 +292,16 @@ class user
 				$database->disconnect();
 				return false;
 			}
+
+			// Set the last login date and IP
+			$this->setLastLogin(new DateTime());
+			$this->setLastLoginIP($_SERVER['REMOTE_ADDR']);
+			// Don't check if this works. If it crashes bad enough to 500 we'll see it in the logs
+			// otherwise it doesn't really matter
+			$this->addToDatabase();
+
+			$database->disconnect();
+			return true;
 		}
 	}
 	
@@ -374,7 +383,6 @@ class user
 
 				$this->setIsChanged(false);
 				$this->setInDatabase(true);
-				
 				$result = true;
 			}
 			else
@@ -394,9 +402,47 @@ class user
 	}
 
 	//Database ##########################################
+	function delete($ADatabase = null)
+	{
+		$result = FALSE;
+		//Make connection if we didn't get one
+		$receivedConnection = !is_null($ADatabase);
+		if(!$receivedConnection)
+		{
+			// Make one
+			$ADatabase = new TDatabase;
+			// Make connection
+			if(!$ADatabase->Connect())
+			{
+				return $result;
+			}
+		}
+
+		if(!is_null($this->getId()) && !is_null($this->getUsername()))
+		{
+			$SQL = 'DELETE FROM users WHERE id = ' . $this->getId() . ';';
+
+			if($ADatabase->query($SQL))
+			{
+				// Don't delete $this but make sure we know we're no longer in the DB
+				$this->setInDatabase(FALSE);
+				$this->setIsChanged(FALSE);
+				$result = TRUE;
+			}
+		}
+
+		if(!$receivedConnection)
+		{
+			//Close database connection only if we made it ourselves
+			$ADatabase->disconnect();
+		}
+
+		return $result;
+	}
+
 	function addToDatabase()
 	{
-		//Connect
+		// Connect
 		$Database = new Tdatabase;
 		$Database->connect();
 		
@@ -440,16 +486,16 @@ class user
 					'" . $this->getFirstName() . "',
 					'" . $this->getLastName() . "',
 					'" . $this->getEmail() . "');";
+			// We just got created
+			$this->setCreated(new DateTime());
 		}
 
 		//remove tabs and spaces. Can't be arsed to combine these regexes into one right now (since I'll have to learn regex first)
 		$SQL = trim(preg_replace('/\n+/', '',preg_replace('/\t+/', '', $SQL)));
 		if($Database->query($SQL))
 		{
-			trigger_error("Query succes", E_USER_NOTICE);
 			$this->setInDatabase(true);
 
-			//Verbreek verbinding
 			$Database->disconnect();
 			return TRUE;
 		}

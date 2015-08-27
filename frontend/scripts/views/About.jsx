@@ -10,7 +10,7 @@ default React.createClass({
         return false;
     },
     render() {
-        return (<div className="col-md-10 col-md-offset-1 col-xs-12">
+        return (<div className="col-md-8 col-md-offset-2 col-xs-12">
           <h1>The association</h1>
           <div className="subheader">DSVK IJzersterk</div>
           <p>We: Daniël Colon, Ruud Kassing, Pouja Nikray and Daniël Schooneveld, started the association with the following goals:</p>

@@ -20,9 +20,12 @@
 				//'calendar' //Some of calendar is accessible to the public.
 			);
 			$publicVerbs = array(
-				'verify'
+				'verify' => 'user'
 			);
-			if(in_array($this->endpoint, $publicFunctions) || in_array($this->verb, $publicVerbs))
+
+			// Only allow access without logging in to allow endpoints or to an endpoints verb
+			// if the verb exists in the pubicVerbs array and matches the endpoint
+			if(in_array($this->endpoint, $publicFunctions) || (array_key_exists($this->verb, $publicVerbs) && $publicVerbs[$this->verb] == $this->endpoint))
 			{
 				return parent::processAPI();
 			}
@@ -53,6 +56,41 @@
 			return parent::processAPI();
 		}
 
+		protected function getDecodedData()
+		{
+			// Get the data being put
+			$PUTArray = json_decode($this->file, true);
+
+			// Check if it worked
+			if(is_null($PUTArray))
+			{
+				// Indicate something went wrong
+				return null;
+			}
+
+			// Sanitize user input
+			$DBTable  = 'users';
+
+			//Connect to database
+			$database = new TDatabase;
+
+			// Check connection
+			if(!$database->connect())
+			{
+				return null;
+			}
+
+			// Clean up
+			// &$value: use reference! This is NOT a pointer.
+			foreach ($PUTArray as $key => &$value)
+			{
+				$value = $database->clean($value);
+			}
+
+			$database->disconnect();
+			return $PUTArray;
+		}
+
 		// Show sender what he sent for debugging
 		protected function requestinfo()
 		{
@@ -76,50 +114,49 @@
 			require_once("$dirname/calendar.php");
 			switch($this->method){
 				case 'GET':
-					switch($this->verb){
-						// Empty verb means user requested a list calendar events
-						case "":
-							// Unless and id was supplied as argument
-							if(isset($this->args[0]) && is_numeric($this->args[0]))
+					// Empty verb means user requested a list calendar events
+					if($this->verb == "")
+					{
+						// Unless and id was supplied as argument
+						if(isset($this->args[0]) && is_numeric($this->args[0]))
+						{
+							// Try to return the calendarEvent for the given id
+							// We don't have to clean input since it's just an int.
+							$ACalendarEvent = new calendarEvent;
+							$ACalendarEvent->setId($this->args[0]);
+							if($ACalendarEvent->fill())
 							{
-								// Try to return the calendarEvent for the given id
-								// We don't have to clean input since it's just an int.
-								trigger_error(print_r($this->args[0], true), E_USER_NOTICE);
-								$ACalendarEvent = new calendarEvent;
-								$ACalendarEvent->setId($this->args[0]);
-								if($ACalendarEvent->fill())
-								{
-									$this->responseCode = 200;
-									return json_encode(array("status" => "200 OK","details" => "calendarEvent returned", "result" =>  $ACalendarEvent->getAsAssociativeArray()));
-								}
-								else
-								{
-									$this->responseCode = 404;
-									return json_encode(array("status" => "404 Not Found","details" => "Couldn't find calendarEvent " . $this->args[0]));
-								}
+								$this->responseCode = 200;
+								return json_encode(array("status" => "200 OK","details" => "calendarEvent returned", "result" =>  $ACalendarEvent->getAsAssociativeArray()));
 							}
 							else
 							{
-								// If we have an empty verb and no args the user has requested a list of calendarEvents
-								$ACalendar = new calendar;
-								if($ACalendar->fill())
-								{
-									$this->responseCode = 200;
-									return json_encode(array("status" => "200 OK","details" => "calendar returned", "result" =>  $ACalendar->getAsAssociativeArray()));
-								}
-								else
-								{
-									// Something went wrong
-									$this->responseCode = 500;
-									return json_encode(array("status" => "500 Internal Server Error","details" => "Couldn't fill calendar"));
-								}
+								$this->responseCode = 404;
+								return json_encode(array("status" => "404 Not Found","details" => "Couldn't find calendarEvent " . $this->args[0]));
 							}
-						break;
-						default:
-							//We can't have verbs in the calendar since everything works by id
-							$this->responseCode = 400;
-							return json_encode(array("status" => "400 Bad Request","details" => "calendarEvents are accessed by their integer id."));
-						break;
+						}
+						else
+						{
+							// If we have an empty verb and no args the user has requested a list of calendarEvents
+							$ACalendar = new calendar;
+							if($ACalendar->fill())
+							{
+								$this->responseCode = 200;
+								return json_encode(array("status" => "200 OK","details" => "calendar returned", "result" =>  $ACalendar->getAsAssociativeArray()));
+							}
+							else
+							{
+								// Something went wrong
+								$this->responseCode = 500;
+								return json_encode(array("status" => "500 Internal Server Error","details" => "Couldn't fill calendar"));
+							}
+						}
+					}
+					else
+					{
+						//We can't have verbs in the calendar since everything works by id
+						$this->responseCode = 400;
+						return json_encode(array("status" => "400 Bad Request","details" => "calendarEvents are accessed by their integer id."));
 					}
 				break;
 				default:
@@ -201,6 +238,9 @@
 						return json_encode(array("status" => "500 Internal Server Error","details" => "Couldn't connect to database"));
 					}
 					$this->verb = $ADatabase->clean($this->verb);
+					// Don't keep the connection for fills.
+					// slightly less optimized but we won't have to close through hoops
+					// to close if before returning
 					$ADatabase->disconnect();
 
 					switch($this->method){
@@ -242,10 +282,9 @@
 								$AUser = new user;
 								$AUser->setUsername($this->verb);
 
-								// Get the data being put
-								$PUTArray = json_decode($this->file, true);
+								// Get a sanitized version of the data put
+								$PUTArray = $this->getDecodedData();
 
-								// Check if it worked
 								if(is_null($PUTArray))
 								{
 									$this->responseCode = 400;
@@ -287,7 +326,7 @@
 									else
 									{
 										$this->responseCode = 200;
-										return json_encode(array("status" => "200 Ok", "details" => "User succesfully updated","result" => $AUser->getAsAssociativeArray()));
+										return json_encode(array("status" => "200 OK", "details" => "User succesfully updated","result" => $AUser->getAsAssociativeArray()));
 									}
 								}
 							}
@@ -295,6 +334,46 @@
 							{
 								$this->responseCode = 403;
 								return json_encode(array("status" => "403 Forbidden","details" => "Only administrators can edit users other than themselves."));
+							}
+						break;
+						case 'DELETE':
+							// Only let admins delete users
+							if($this->currentUser->getIsAdmin())
+							{
+								// Try to fill for the given username
+								$AUser = new user();
+								$AUser->setUsername($this->verb);
+								if($AUser->fill())
+								{
+									// Admins cannot be deleted from the front end.
+									if($AUser->getIsAdmin())
+									{
+										$this->responseCode = 403;
+										return json_encode(array("status" => "403 Forbidden","details" => "Administrators cannot be deleted."));
+									}
+
+									// Delete it
+									if($AUser->Delete())
+									{
+										$this->responseCode = 200;
+										return json_encode(array("status" => "200 OK", "details" => "User " . $this->verb . " succesfully deleted."));
+									}
+									else
+									{
+										$this->responseCode = 500;
+										return json_encode(array("status" => "500 Internal Server Error","details" => "Couldn't delete user " . $this->verb . "."));
+									}
+								}
+								else
+								{
+									$this->responseCode = 404;
+									return json_encode(array("status" => "404 Not Found","details" => "Couldn't find user " . $this->verb));
+								}
+							}
+							else
+							{
+								$this->responseCode = 403;
+								return json_encode(array("status" => "403 Forbidden","details" => "Admin rights required"));
 							}
 						break;
 						default:
@@ -305,33 +384,9 @@
 				break;
 			}
 
-			// Apparantly somethign went wrong if we still haven't returned
+			// Apparantly something went wrong if we still haven't returned
 			$this->responseCode = 400;
 			return json_encode(array("status" => "400 Bad Request","details" => "Nothing was done"));
-
-			/* Login (Might still want to use some of this when implementing OAuth)
-			if($this->verb == "login" && $this->method == 'PUT')
-			{
-				$PUTArray = json_decode($this->file, true);
-				// Check if it worked
-				if(is_null($PUTArray))
-				{
-					return json_encode(array("error" => "400 Bad Request","details" => "Couldn't decode json in PUT data"));
-				}
-
-				// Get the username and password
-				$AUsername = $PUTArray["username"];
-				$APassword = $PUTArray["password"];
-
-				// Check if we got those
-				if(is_null($AUsername) || is_null($APassword))
-				{
-					return json_encode(array("error" => "400 Bad Request","details" => "Username or password missing from PUT data"));
-				}
-
-				$AUser = new user;
-				return $AUser->login($AUsername, $APassword);
-			}*/
 		}
 	}
 ?>
