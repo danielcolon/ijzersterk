@@ -122,6 +122,7 @@ default React.createClass({
                 focusEvent={this.state.focusEvent}
                 onDayClick={this.onDayClick}
                 toggleFocusEvent={this.toggleFocusEvent}
+                toggleView={this.props.toggleView}
                 />);
 
             current.add(1, 'day');

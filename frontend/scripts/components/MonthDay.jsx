@@ -74,7 +74,10 @@ default React.createClass({
             <div className="cal-cell1 cal-cell" onMouseOver={this.mouseOver}
                 onMouseLeave={this.mouseLeave} onClick={this.onClick}>
                 <div className={this.getCSSClasses(this.props.date, events)} >
-                    <span className="pull-right" data-cal-date>{this.props.date.date()}</span>
+                    <span className="pull-right" data-cal-date=""
+                        onClick={this.props.toggleView.bind(null, 'day', this.props.date)}>
+                            {this.props.date.date()}
+                    </span>
                     <WeekBox date={this.props.date} visible={this.props.focusWeek}/>
                     <div className="events-list">{events.map(this.renderEvent)}</div>
                     <DayTick visible={this.state.hover && events.length > 0}/>
