@@ -2,7 +2,7 @@ var AgendaEvents = {
     events:[{
         id: 1,
         type: 'training',
-        startDate: '2015-10-09T14:00',
+        startDate: '2015-10-09T14:15',
         endDate: '2015-10-09T15:00',
         title: 'VKR Training',
         description: 'Training en begeleiding in de VKR',
@@ -32,8 +32,8 @@ var AgendaEvents = {
     },{
         id: 3,
         type: 'social',
-        startDate: '2015-10-20T10:00',
-        endDate: '2015-10-20T24:00',
+        startDate: '2015-10-20T03:00',
+        endDate: '2015-10-20T23:59',
         title: 'Barbeque',
         description: 'Vlees, vuur, saus, bier. Wat wil je nog meer?',
         attendees: [{
@@ -71,8 +71,19 @@ var AgendaEvents = {
         },{
             name:'Peter'
         }]
+    },{
+        id: 6,
+        type: 'other',
+        startDate: '2015-10-08T14:00',
+        endDate: '2015-10-09T03:00',
+        title: 'A special event!',
+        description: '',
+        attendees: []
     }],
     types: [{
+        type: 'other',
+        style: 'special'
+    },{
         type: 'training',
         style: 'important'
     },{
