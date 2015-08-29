@@ -17,7 +17,7 @@ default React.createClass({
     render() {
         var tickDay = 'tick-day' + (this.props.dayIndex + 1);
         return (
-            <div id="cal-slide-box" key="cal-slide">
+            <div {...this.props} id="cal-slide-box" key="cal-slide">
                     <span id="cal-slide-tick" className={tickDay}></span>
                     <div id="cal-slide-content" className="cal-event-list">
                         <ul className="unstyled list-unstyled">

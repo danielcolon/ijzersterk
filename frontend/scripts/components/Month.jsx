@@ -4,6 +4,7 @@ import MonthDay from './MonthDay.jsx';
 import _ from 'lodash';
 import Agenda from '../models/Agenda.js';
 import SlideBox from './SlideBox.jsx';
+import {Collapse} from 'react-bootstrap';
 
 /**
  * Gets the fist visible day of the month calendar.
@@ -79,19 +80,16 @@ default React.createClass({
      * @return {React.component}       A React component to be rendered.
      */
     renderWeek(days, index) {
-        var slideBox = null;
+        var slideBoxIndex = -1;
+        var events = [];
         if (this.state.focusDay !== null) {
             var $self = this;
-            var dayIndex = _.findIndex(days, function(day) {
+            slideBoxIndex = _.findIndex(days, function(day) {
                 return day.props.date.isSame($self.state.focusDay, 'day');
             });
-
-            if (dayIndex !== -1) {
-                var events = Agenda.getEvents(this.state.focusDay, 'YYYY-MM-DD');
-                slideBox = <SlideBox toggleFocusEvent={this.toggleFocusEvent}
-                    events={events} dayIndex={dayIndex}/>;
-            }
+            events = Agenda.getEvents(this.state.focusDay, 'YYYY-MM-DD');
         }
+
         return (
                 <div key={index}>
                     <div className="cal-row-fluid cal-before-eventlist"
@@ -99,7 +97,10 @@ default React.createClass({
                     onMouseLeave={this.toggleFocusWeek.bind(null, days[0].props.date, false)}>
                         {days}
                     </div>
-                    {slideBox}
+                    <Collapse in={slideBoxIndex !== -1}>
+                        <SlideBox toggleFocusEvent={this.toggleFocusEvent} events={events}
+                            dayIndex={slideBoxIndex}/>
+                    </Collapse>
                 </div>);
 
     },
