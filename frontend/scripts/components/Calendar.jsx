@@ -1,9 +1,8 @@
 import React from 'react';
 import moment from 'moment';
 import Month from './Month.jsx';
-import classNames from 'classnames';
 import Day from './Day.jsx';
-
+import CalendarControls from './CalendarControls.jsx';
 export
 default React.createClass({
     getInitialState() {
@@ -22,7 +21,7 @@ default React.createClass({
             date: this.state.date.add(1, this.state.view)
         });
     },
-    resetDate() {
+    reset() {
         this.setState({
             date: moment()
         });
@@ -49,32 +48,12 @@ default React.createClass({
         return this.state.date.format('dddd DD MMMM, YYYY');
     },
     render() {
-        var monthClasses = classNames('btn', 'btn-warning', {
-            'active': this.state.view === 'month'
-        });
-        var dayClasses = classNames('btn', 'btn-warning', {
-            'active': this.state.view === 'day'
-        });
         return (
             <div id="calendar">
                 <div className="page-header">
-                    <span className="pull-right form-inline">
-                        <div className="btn-group">
-                            <button className="btn btn-primary" onClick={this.prev}>&lt;&lt; Prev</button>
-                            <button className="btn btn-primary" onClick={this.resetDate}>Today</button>
-                            <button className="btn btn-primary" onClick={this.next}>Next &gt;&gt;</button>
-                        </div>
-                        <div className="btn-group">
-                            <button className={monthClasses}
-                                onClick={this.toggleView.bind(null, 'month', this.state.date)}>
-                                    Month
-                            </button>
-                            <button className={dayClasses}
-                                onClick={this.toggleView.bind(null, 'day', this.state.date)}>
-                                Day
-                            </button>
-                        </div>
-                    </span>
+                    <CalendarControls className="pull-right form-inline"
+                        next={this.next} prev={this.prev} reset={this.reset}
+                        view={this.state.view} toggleView={this.toggleView} date={this.state.date}/>
                     <h3>{this.renderDate()}</h3>
                 </div>
                 <div className="cal-context">
