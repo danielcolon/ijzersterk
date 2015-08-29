@@ -77,12 +77,8 @@ default React.createClass({
                     </span>
                     <h3>{this.renderDate()}</h3>
                 </div>
-                <div className="row">
-                    <div className="col-md-10">
-                        <div className="cal-context">
-                            {this.renderView()}
-                        </div>
-                    </div>
+                <div className="cal-context">
+                    {this.renderView()}
                 </div>
             </div>
         );
