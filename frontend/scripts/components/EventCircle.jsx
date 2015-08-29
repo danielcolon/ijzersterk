@@ -1,12 +1,12 @@
 import React from 'react';
 import _ from 'lodash';
 import classNames from 'classnames';
-import AgendaEvents from '../models/AgendaEvents.js';
+import Agenda from '../models/Agenda.js';
 
 export default React.createClass({
     render(){
         var event = this.props.event;
-        var style = _.find(AgendaEvents.types, {
+        var style = _.find(Agenda.types, {
             type: event.type
         }).style;
 

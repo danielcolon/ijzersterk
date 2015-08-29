@@ -1,7 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import classNames from 'classnames';
-import AgendaEvents from '../models/AgendaEvents.js';
+import Agenda from '../models/Agenda.js';
 import {
     Tooltip, OverlayTrigger
 }
@@ -61,7 +61,7 @@ default React.createClass({
         });
 
         if (focusEvent !== undefined) {
-            var eventStyle = _.find(AgendaEvents.types, {
+            var eventStyle = _.find(Agenda.types, {
                 type: focusEvent.type
             }).style;
             classes += ` dh-event-${eventStyle}`;
@@ -69,7 +69,7 @@ default React.createClass({
         return classes;
     },
     render() {
-        var events = AgendaEvents.getEvents(this.props.date);
+        var events = Agenda.getEvents(this.props.date);
         return (
             <div className="cal-cell1 cal-cell" onMouseOver={this.mouseOver}
                 onMouseLeave={this.mouseLeave} onClick={this.onClick}>

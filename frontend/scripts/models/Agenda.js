@@ -1,4 +1,4 @@
-var AgendaEvents = {
+var Agenda = {
     events: [{
         id: 1,
         type: 'training',
@@ -91,7 +91,7 @@ var AgendaEvents = {
         style: 'warning'
     }],
     getEvents(date) {
-        return AgendaEvents.events.filter(function(event) {
+        return Agenda.events.filter(function(event) {
             return date.isBetween(event.startDate, event.endDate, 'day') ||
                 date.isSame(event.startDate, 'day') ||
                 date.isSame(event.endDate, 'day');
@@ -99,4 +99,4 @@ var AgendaEvents = {
     }
 };
 export
-default AgendaEvents;
+default Agenda;

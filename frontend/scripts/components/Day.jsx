@@ -1,5 +1,5 @@
 import React from 'react';
-import AgendaEvents from '../models/AgendaEvents.js';
+import Agenda from '../models/Agenda.js';
 import classNames from 'classnames';
 import _ from 'lodash';
 import moment from 'moment';
@@ -48,7 +48,7 @@ default React.createClass({
         },
         renderAllDay(event) {
             if (isAllDay(this.props.date, event)) {
-                var style = _.find(AgendaEvents.types, {
+                var style = _.find(Agenda.types, {
                     type: event.type
                 }).style;
                 var classes = classNames('day-highlight', 'dh-event-' + style);
@@ -67,7 +67,7 @@ default React.createClass({
         },
         renderBefore(event) {
             if (isBeforeStart(this.props.date, event)) {
-                var style = _.find(AgendaEvents.types, {
+                var style = _.find(Agenda.types, {
                     type: event.type
                 }).style;
                 var classes = classNames('day-highlight', 'dh-event-' + style);
@@ -89,7 +89,7 @@ default React.createClass({
         },
         renderEvent(event, index) {
             if (!isAllDay(this.props.date, event) && !isBeforeStart(this.props.date, event)) {
-                var eventStyle = _.find(AgendaEvents.types, {
+                var eventStyle = _.find(Agenda.types, {
                     type: event.type
                 }).style;
                 var classes = classNames('pull-left', 'day-event', 'day-highlight', 'dh-event-' + eventStyle);
@@ -126,7 +126,7 @@ default React.createClass({
             }
         },
         render() {
-            var events = AgendaEvents.getEvents(this.props.date);
+            var events = Agenda.getEvents(this.props.date);
             return (<div id="cal-day-box">
                         <div className="row-fluid clearfix cal-row-head">
                             <div className="span1 col-xs-1 cal-cell">Time</div>

@@ -2,7 +2,7 @@ import React from 'react/addons';
 import moment from 'moment';
 import MonthDay from './MonthDay.jsx';
 import _ from 'lodash';
-import AgendaEvents from '../models/AgendaEvents.js';
+import Agenda from '../models/Agenda.js';
 import SlideBox from './SlideBox.jsx';
 
 /**
@@ -45,7 +45,7 @@ default React.createClass({
      * @param  {String} date The date which was clicked on in YYYY-MM-DD format.
      */
     onDayClick(date){
-        var events = AgendaEvents.getEvents(date);
+        var events = Agenda.getEvents(date);
         if (events.length === 0 ||
             (this.state.focusDay !== null && this.state.focusDay.isSame(date, 'day'))) {
             this.setState({
@@ -87,7 +87,7 @@ default React.createClass({
             });
 
             if (dayIndex !== -1) {
-                var events = AgendaEvents.getEvents(this.state.focusDay, 'YYYY-MM-DD');
+                var events = Agenda.getEvents(this.state.focusDay, 'YYYY-MM-DD');
                 slideBox = <SlideBox toggleFocusEvent={this.toggleFocusEvent}
                     events={events} dayIndex={dayIndex}/>;
             }
