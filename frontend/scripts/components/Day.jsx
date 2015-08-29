@@ -22,11 +22,12 @@ var generateHours = function() {
 };
 
 var isAllDay = function(today, event) {
-    return moment(event.startDate).isBefore(today, 'day') && moment(event.endDate).isAfter(today, 'day');
+    return moment(event.startDate).isBefore(today, 'day')
+    && moment(event.endDate).isAfter(today, 'day');
 };
 
 var isBeforeStart = function(today, event) {
-    return moment(event.endDate).diff(today.clone().hours(START), 'hours') < 0;
+    return moment(event.endDate).isBefore(today.clone().hours(START), 'hours');
 };
 
 export
@@ -111,7 +112,7 @@ default React.createClass({
 
                 return <div key={index} className={classes} style={style}>
                     <span className="cal-hours">
-                        {eventStart.format('DD MMM HH:mm')}-
+                        {eventStart.format('D MMM HH:mm')}-
                         {eventEnd.format('HH:mm')}
                     </span>
                     {event.title}<br/>
@@ -139,6 +140,7 @@ default React.createClass({
                                 {generateHours().map(this.renderHour)}
                             </div>
                             {events.map(this.renderEvent)}
-                        </div> < /div>);
+                        </div>
+                    </div>);
     }
 });
