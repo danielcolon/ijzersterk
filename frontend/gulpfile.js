@@ -176,15 +176,14 @@ gulp.task('watch', ['clean'], function() {
 });
 
 // Creates a dist directory which can be run indepedant
-gulp.task('build', ['clean'], function() {
+gulp.task('build', ['clean'], function(cb) {
     process.env.NODE_ENV = 'production';
-    gulp.start('browserify', 'styles', 'html-copy', 'image');
+    runSequence(['browserify', 'styles', 'html-copy', 'image', 'fonts'], cb);
 });
 
 // Creates a zip file which is deployable
 gulp.task('deploy', function(cb){
-    process.env.NODE_ENV = 'production';
-    runSequence('clean', ['browserify', 'styles', 'html-copy', 'image'], 'zip', 'clean', cb);
+    runSequence('build', 'zip', 'clean', cb);
 })
 
 gulp.task('default', function() {
