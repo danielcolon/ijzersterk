@@ -8,7 +8,6 @@ const START = 7;
 const HEIGHT = 30; //each line is 30 pixels
 const END = 23.5;
 
-
 var generateHours = function() {
     const hours = [];
     for (var hour = START; hour <= END; hour++) {
@@ -65,14 +64,14 @@ default React.createClass({
                 </div>;
             }
         },
-        renderBefore(event) {
+        renderBefore(event, index) {
             if (isBeforeStart(this.props.date, event)) {
                 var style = _.find(Agenda.types, {
                     type: event.type
                 }).style;
                 var classes = classNames('day-highlight', 'dh-event-' + style);
 
-                return <div className="row-fluid clearfix cal-day-hour">
+                return <div key={index} className="row-fluid clearfix cal-day-hour">
                     <div className="span1 col-xs-1">
                         <b>Ends before timeline</b>
                     </div>
@@ -92,7 +91,7 @@ default React.createClass({
                 var eventStyle = _.find(Agenda.types, {
                     type: event.type
                 }).style;
-                var classes = classNames('pull-left', 'day-event', 'day-highlight', 'dh-event-' + eventStyle);
+                var classes = classNames('pull-left', 'day-event', 'day-highlight', 'col-xs-3', 'dh-event-' + eventStyle);
                 var startDay = this.props.date.clone().hour(START).minutes(0);
                 var eventStart = moment(event.startDate);
                 var eventEnd = moment(event.endDate);
@@ -109,19 +108,14 @@ default React.createClass({
                 }
                 style.height = Math.min(generateHours().length * HEIGHT * 2 - style.marginTop,
                     style.height);
+                style.minHeight = style.height; // Needed for hover effect
 
                 return <div key={index} className={classes} style={style}>
                     <span className="cal-hours">
                         {eventStart.format('D MMM HH:mm')}-
                         {eventEnd.format('HH:mm')}
-                    </span>
-                    {event.title}<br/>
-                    {event.description}<br/>
-                    <ul>
-                        {event.attendees.map(function(attendee, liIndex){
-                            return <li key={liIndex}>{attendee.name}</li>;
-                        })}
-                    </ul>
+                    </span><br/>
+                    {event.title}
                 </div>;
             }
         },

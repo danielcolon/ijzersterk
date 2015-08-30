@@ -5,6 +5,7 @@ import _ from 'lodash';
 import Agenda from '../models/Agenda.js';
 import SlideBox from './SlideBox.jsx';
 import {Collapse} from 'react-bootstrap';
+import EL from '../EventListener.js';
 
 /**
  * Gets the fist visible day of the month calendar.
@@ -40,12 +41,19 @@ default React.createClass({
             focusEvent: null
         };
     },
+    componentDidMount(){
+        var onEvents = ['toggleFocusEvent', 'setFocusDay', 'toggleFocusWeek'];
+        var $self = this;
+        onEvents.map(function(event){
+            EL.on(event, $self[event]);
+        });
+    },
     /**
      * Invoked when clicked on a day.
      * Sets the focusDay state to that day if not already set, otherwise null.
      * @param  {String} date The date which was clicked on in YYYY-MM-DD format.
      */
-    onDayClick(date){
+    setFocusDay(date){
         var events = Agenda.getEvents(date);
         if (events.length === 0 ||
             (this.state.focusDay !== null && this.state.focusDay.isSame(date, 'day'))) {
@@ -93,13 +101,12 @@ default React.createClass({
         return (
                 <div key={index}>
                     <div className="cal-row-fluid cal-before-eventlist"
-                    onMouseEnter={this.toggleFocusWeek.bind(null, days[0].props.date, true)}
-                    onMouseLeave={this.toggleFocusWeek.bind(null, days[0].props.date, false)}>
+                    onMouseEnter={EL.partialEmit('toggleFocusWeek', days[0].props.date, true)}
+                    onMouseLeave={EL.partialEmit('toggleFocusWeek', days[0].props.date, false)}>
                         {days}
                     </div>
                     <Collapse in={slideBoxIndex !== -1}>
-                        <SlideBox toggleFocusEvent={this.toggleFocusEvent} events={events}
-                            dayIndex={slideBoxIndex}/>
+                        <SlideBox events={events} dayIndex={slideBoxIndex}/>
                     </Collapse>
                 </div>);
 
@@ -121,9 +128,6 @@ default React.createClass({
                 viewMonth={this.props.date}
                 focusWeek={focus}
                 focusEvent={this.state.focusEvent}
-                onDayClick={this.onDayClick}
-                toggleFocusEvent={this.toggleFocusEvent}
-                toggleView={this.props.toggleView}
                 />);
 
             current.add(1, 'day');

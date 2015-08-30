@@ -10,6 +10,7 @@ import _ from 'lodash';
 import WeekBox from './WeekBox.jsx';
 import DayTick from './DayTick.jsx';
 import EventCircle from './EventCircle.jsx';
+import EL from '../EventListener.js';
 
 export
 default React.createClass({
@@ -17,9 +18,6 @@ default React.createClass({
         return {
             hover: false
         };
-    },
-    onClick() {
-        this.props.onDayClick(this.props.date);
     },
     mouseOver() {
         this.setState({
@@ -34,12 +32,12 @@ default React.createClass({
     renderEvent(event, index) {
         const tooltip = (<Tooltip>{event.title}</Tooltip>);
         return <OverlayTrigger
-                    onMouseOver={this.props.toggleFocusEvent.bind(null, event, true)}
+                    onMouseOver={EL.partialEmit('toggleFocusEvent', event, true)}
                     key={index}
                     placement='top'
                     overlay={tooltip}>
                 <EventCircle
-                    onMouseLeave={this.props.toggleFocusEvent.bind(null, event, false)}
+                    onMouseLeave={EL.partialEmit('toggleFocusEvent', event, false)}
                     event={event}/>
             </OverlayTrigger>;
     },
@@ -72,15 +70,16 @@ default React.createClass({
         var events = Agenda.getEvents(this.props.date);
         return (
             <div className="cal-cell1 cal-cell" onMouseOver={this.mouseOver}
-                onMouseLeave={this.mouseLeave} onClick={this.onClick}>
+                onMouseLeave={this.mouseLeave} >
                 <div className={this.getCSSClasses(this.props.date, events)} >
                     <span className="pull-right" data-cal-date=""
-                        onClick={this.props.toggleView.bind(null, 'day', this.props.date)}>
+                        onClick={EL.partialEmit('toggleView', 'day', this.props.date)}>
                             {this.props.date.date()}
                     </span>
                     <WeekBox date={this.props.date} visible={this.props.focusWeek}/>
                     <div className="events-list">{events.map(this.renderEvent)}</div>
-                    <DayTick visible={this.state.hover && events.length > 0}/>
+                    <DayTick onClick={EL.partialEmit('setFocusDay', this.props.date)}
+                        visible={this.state.hover && events.length > 0}/>
                 </div>
             </div>
         );

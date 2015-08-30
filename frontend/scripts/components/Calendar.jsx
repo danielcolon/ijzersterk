@@ -3,13 +3,37 @@ import moment from 'moment';
 import Month from './Month.jsx';
 import Day from './Day.jsx';
 import CalendarControls from './CalendarControls.jsx';
+import EventModal from './EventModal.jsx';
+import EventListener from '../EventListener.js';
+
 export
 default React.createClass({
     getInitialState() {
         return {
             date: moment(),
-            view: 'month'
+            view: 'month',
+            showEventModal: false,
+            eventId: null
         };
+    },
+    componentDidMount(){
+        var onEvents = ['openEvent', 'closeEvent', 'prev', 'next', 'reset', 'toggleView'];
+        var $self = this;
+        onEvents.map(function(onEvent){
+            EventListener.on(onEvent, $self[onEvent]);
+        });
+    },
+    openEvent(id){
+        this.setState({
+            showEventModal: true,
+            eventId: id
+        });
+    },
+    closeEvent(){
+        this.setState({
+            showEventModal: false,
+            eventId: null
+        });
     },
     prev() {
         this.setState({
@@ -34,9 +58,7 @@ default React.createClass({
     },
     renderView() {
         if (this.state.view === 'month') {
-            return <Month key={2}
-                date={this.state.date}
-                toggleView={this.toggleView}></Month>;
+            return <Month key={2} date={this.state.date}></Month>;
         } else if (this.state.view === 'day') {
             return <Day key={2} date={this.state.date}></Day>;
         }
@@ -51,14 +73,15 @@ default React.createClass({
         return (
             <div id="calendar">
                 <div className="page-header">
-                    <CalendarControls className="pull-right form-inline"
-                        next={this.next} prev={this.prev} reset={this.reset}
-                        view={this.state.view} toggleView={this.toggleView} date={this.state.date}/>
+                    <CalendarControls className="pull-right form-inline" view={this.state.view}
+                        date={this.state.date}/>
                     <h3>{this.renderDate()}</h3>
                 </div>
                 <div className="cal-context">
                     {this.renderView()}
                 </div>
+                <EventModal event={this.state.eventId} show={this.state.showEventModal}
+                    onHide={this.closeEvent}/>
             </div>
         );
     }
