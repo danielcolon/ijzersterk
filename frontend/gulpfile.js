@@ -103,7 +103,7 @@ gulp.task('watchify', function() {
 
 // Tells browserify how to bundle all the files
 gulp.task('browserify', function() {
-    browserify(config.jsx)
+    return browserify(config.jsx)
         .transform(babelify)
         .bundle()
         .pipe(source(config.bundle))
