@@ -3,6 +3,7 @@ import Agenda from '../models/Agenda.js';
 import classNames from 'classnames';
 import _ from 'lodash';
 import moment from 'moment';
+import EL from '../EventListener.js';
 
 const START = 7;
 const HEIGHT = 30; //each line is 30 pixels
@@ -21,12 +22,12 @@ var generateHours = function() {
 };
 
 var isAllDay = function(today, event) {
-    return moment(event.startDate).isBefore(today, 'day')
-    && moment(event.endDate).isAfter(today, 'day');
+    return moment(event.start).isBefore(today, 'day')
+    && moment(event.end).isAfter(today, 'day');
 };
 
 var isBeforeStart = function(today, event) {
-    return moment(event.endDate).isBefore(today.clone().hours(START), 'hours');
+    return moment(event.end).isBefore(today.clone().hours(START), 'hours');
 };
 
 export
@@ -48,7 +49,7 @@ default React.createClass({
         renderAllDay(event) {
             if (isAllDay(this.props.date, event)) {
                 var style = _.find(Agenda.types, {
-                    type: event.type
+                    id: event.idEventType
                 }).style;
                 var classes = classNames('day-highlight', 'dh-event-' + style);
 
@@ -58,7 +59,8 @@ default React.createClass({
                     </div>
                     <div className="span11 col-xs-11">
                         <div className={classes}>
-                            <a href="#" className="event-item">{event.title}</a>
+                            <a onClick={EL.partialEmit('openEvent', event.id)}
+                                className="event-item">{event.title}</a>
                         </div>
                     </div>
                 </div>;
@@ -67,7 +69,7 @@ default React.createClass({
         renderBefore(event, index) {
             if (isBeforeStart(this.props.date, event)) {
                 var style = _.find(Agenda.types, {
-                    type: event.type
+                    id: event.idEventType
                 }).style;
                 var classes = classNames('day-highlight', 'dh-event-' + style);
 
@@ -78,9 +80,10 @@ default React.createClass({
                     <div className="span11 col-xs-11">
                         <div className={classes}>
                             <span className="cal-hours pull-right">
-                                {moment(event.endDate).format('HH:mm')}
+                                {moment(event.end).format('HH:mm')}
                             </span>
-                            <a href="#" className="event-item">{event.title}</a>
+                            <a onClick={EL.partialEmit('openEvent', event.id)}
+                                className="event-item">{event.title}</a>
                         </div>
                     </div>
                 </div>;
@@ -89,12 +92,12 @@ default React.createClass({
         renderEvent(event, index) {
             if (!isAllDay(this.props.date, event) && !isBeforeStart(this.props.date, event)) {
                 var eventStyle = _.find(Agenda.types, {
-                    type: event.type
+                    id: event.idEventType
                 }).style;
                 var classes = classNames('pull-left', 'day-event', 'day-highlight', 'col-xs-3', 'dh-event-' + eventStyle);
                 var startDay = this.props.date.clone().hour(START).minutes(0);
-                var eventStart = moment(event.startDate);
-                var eventEnd = moment(event.endDate);
+                var eventStart = moment(event.start);
+                var eventEnd = moment(event.end);
                 var style = {
                     marginTop: 0,
                     height: 'auto'
@@ -115,7 +118,8 @@ default React.createClass({
                         {eventStart.format('D MMM HH:mm')}-
                         {eventEnd.format('HH:mm')}
                     </span><br/>
-                    {event.title}
+                    <a onClick={EL.partialEmit('openEvent', event.id)}
+                                className="event-item">{event.title}</a>
                 </div>;
             }
         },

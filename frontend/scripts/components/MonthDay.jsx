@@ -60,7 +60,7 @@ default React.createClass({
 
         if (focusEvent !== undefined) {
             var eventStyle = _.find(Agenda.types, {
-                type: focusEvent.type
+                id: focusEvent.idEventType
             }).style;
             classes += ` dh-event-${eventStyle}`;
         }

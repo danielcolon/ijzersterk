@@ -7,7 +7,7 @@ export default React.createClass({
     render(){
         var event = this.props.event;
         var style = _.find(Agenda.types, {
-            type: event.type
+            id: event.idEventType
         }).style;
 
         var classes = classNames(this.props.className, 'pull-left', 'event', 'event-' + style);

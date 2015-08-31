@@ -80,7 +80,7 @@ default React.createClass({
                 <div className="cal-context">
                     {this.renderView()}
                 </div>
-                <EventModal event={this.state.eventId} show={this.state.showEventModal}
+                <EventModal eventId={this.state.eventId} show={this.state.showEventModal}
                     onHide={this.closeEvent}/>
             </div>
         );

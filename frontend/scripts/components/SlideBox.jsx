@@ -8,9 +8,10 @@ default React.createClass({
         return (
             <li key={index}>
                 <EventCircle event={event}/>&nbsp;
-                <a href="#" data-event-id
+                <a data-event-id=""
                     onMouseOver={EL.partialEmit('toggleFocusEvent', event, true)}
                     onMouseLeave={EL.partialEmit('toggleFocusEvent', event, true)}
+                    onClick={EL.partialEmit('openEvent', event.id)}
                     className="event-item">
                     {event.title}
                 </a>

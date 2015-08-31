@@ -1,100 +1,112 @@
+import _ from 'lodash';
+import moment from 'moment';
+//TODO This should be replaced by some service/model that fetches/represents the current logged in user
+var user = {
+    name: 'Pouja Nikray',
+    id: 1,
+    isAdmin: false
+};
+
 var Agenda = {
     events: [{
         id: 1,
-        type: 'training',
-        startDate: '2015-10-09T14:15',
-        endDate: '2015-10-09T15:00',
+        idEventType: 1,
+        idOwner: 1,
         title: 'VKR Training',
-        description: 'Training en begeleiding in de VKR',
-        attendees: [{
-            name: 'Pouja',
-        }, {
-            name: 'Daniel'
-        }]
+        description: 'Weekelijkse training in de vkr',
+        start: '2015-09-10T12:00:00',
+        end: '2015-09-10T18:00:00',
+        viewLevel: 1,
+        editLevel: 2,
+        subscribed: ['Pouja Nikray', 'Joey', 'Daniël Colon']
     }, {
         id: 2,
-        type: 'training',
-        startDate: '2015-10-02T14:00',
-        endDate: '2015-10-02T20:00',
+        idEventType: 1,
+        idOwner: 1,
         title: 'VKR Training',
-        description: 'Training en begeleiding in de VKR',
-        attendees: [{
-            name: 'Pouja',
-        }, {
-            name: 'Daniel'
-        }, {
-            name: 'Peter'
-        }, {
-            name: 'Ruud'
-        }, {
-            name: 'Maikel'
-        }]
+        description: 'Weekelijkse training in de vkr',
+        start: '2015-09-17T12:00',
+        end: '2015-09-17T18:00',
+        viewLevel: 1,
+        editLevel: 2,
+        subscribed: ['Pouja Nikray', 'Joey', 'Daniël Colon']
     }, {
         id: 3,
-        type: 'social',
-        startDate: '2015-10-20T03:00',
-        endDate: '2015-10-20T23:59',
-        title: 'Barbeque',
-        description: 'Vlees, vuur, saus, bier. Wat wil je nog meer?',
-        attendees: [{
-            name: 'Pouja',
-        }, {
-            name: 'Daniel'
-        }, {
-            name: 'Peter'
-        }, {
-            name: 'Ruud'
-        }, {
-            name: 'Maikel'
-        }]
+        idEventType: 1,
+        idOwner: 1,
+        title: 'VKR Training',
+        description: 'Weekelijkse training in de vkr',
+        start: '2015-09-24T12:00',
+        end: '2015-09-24T18:00',
+        viewLevel: 1,
+        editLevel: 2,
+        subscribed: ['Pouja Nikray', 'Joey', 'Daniël Colon']
     }, {
         id: 4,
-        type: 'social',
-        startDate: '2015-10-13T12:00',
-        endDate: '2015-10-20T18:00',
-        title: 'Intro week',
-        description: 'Ontgroening van de nieuwe leden',
-        attendees: [{
-            name: 'Auke'
-        }]
-    }, {
-        id: 5,
-        type: 'training',
-        startDate: '2015-10-09T14:00',
-        endDate: '2015-10-09T15:00',
-        title: 'Deadlift day',
-        description: 'Deadlift, more deadlifts and then more deadlifts.',
-        attendees: [{
-            name: 'Pouja',
-        }, {
-            name: 'Daniel'
-        }, {
-            name: 'Peter'
-        }]
-    }, {
-        id: 6,
-        type: 'other',
-        startDate: '2015-10-08T14:00',
-        endDate: '2015-10-09T03:00',
-        title: 'A special event!',
-        description: '',
-        attendees: []
+        idEventType: 1,
+        idOwner: 1,
+        title: 'VKR Training',
+        description: 'Weekelijkse training in de vkr',
+        start: '2015-10-01T12:00',
+        end: '2015-10-01T18:00',
+        viewLevel: 1,
+        editLevel: 2,
+        subscribed: ['Pouja Nikray', 'Joey', 'Daniël Colon']
     }],
+    // Available types: important, warning, info, inverse, success, special
     types: [{
-        type: 'other',
-        style: 'special'
-    }, {
+        id: 1,
         type: 'training',
-        style: 'important'
-    }, {
-        type: 'social',
-        style: 'warning'
+        style: 'special'
     }],
+    getEvent(id) {
+        if (id === 'new' || id === null || id === undefined) {
+            return {
+                id: null,
+                idEventType: 1,
+                start: moment().format('YYYY-MM-DDTHH:mm:ss'),
+                end: moment().add(3, 'hours').format('YYYY-MM-DDTHH:mm:ss'),
+                title: '',
+                description: '',
+                viewLevel:1,
+                editLevel:1,
+                subscribed: []
+            }
+        }
+        return _.find(Agenda.events, {
+            id: id
+        });
+    },
+    createEvent(event) {
+        event.id = _(Agenda.events)
+            .pluck('id')
+            .max()
+            .value() + 1;
+        Agenda.events.push(event);
+        return event;
+    },
+    attend(event) {
+        Agenda.getEvent(event.id).subscribed.push(user.name)
+    },
+    leave(event) {
+        _.remove(Agenda.getEvent(event.id).subscribed, function(name){
+            return name === user.name;
+        });
+    },
+    canEdit(){
+        return true
+    },
     getEvents(date) {
         return Agenda.events.filter(function(event) {
-            return date.isBetween(event.startDate, event.endDate, 'day') ||
-                date.isSame(event.startDate, 'day') ||
-                date.isSame(event.endDate, 'day');
+            return date.isBetween(event.start, event.end, 'day') ||
+                date.isSame(event.start, 'day') ||
+                date.isSame(event.end, 'day');
+        });
+    },
+    isAttending(event) {
+
+        return event.subscribed.some(function(attendee) {
+            return attendee === user.name;
         });
     }
 };
