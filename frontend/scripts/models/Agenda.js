@@ -1,5 +1,7 @@
 import _ from 'lodash';
 import moment from 'moment';
+import EL from '../EventListener.js';
+
 //TODO This should be replaced by some service/model that fetches/represents the current logged in user
 var user = {
     name: 'Pouja Nikray',
@@ -86,12 +88,14 @@ var Agenda = {
         return event;
     },
     attend(event) {
-        Agenda.getEvent(event.id).subscribed.push(user.name)
+        Agenda.getEvent(event.id).subscribed.push(user.name);
+        EL.emit('event.changed', Agenda.getEvent(event.id));
     },
     leave(event) {
         _.remove(Agenda.getEvent(event.id).subscribed, function(name){
             return name === user.name;
         });
+        EL.emit('event.changed', Agenda.getEvent(event.id));
     },
     canEdit(){
         return true
@@ -104,7 +108,6 @@ var Agenda = {
         });
     },
     isAttending(event) {
-
         return event.subscribed.some(function(attendee) {
             return attendee === user.name;
         });
