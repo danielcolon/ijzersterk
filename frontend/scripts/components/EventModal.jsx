@@ -3,9 +3,10 @@ import {Modal, Button, ButtonGroup} from 'react-bootstrap';
 import Agenda from '../models/Agenda.js';
 import moment from 'moment';
 import EL from '../EventListener.js';
+import EditEvent from './EditEvent.jsx';
+import ViewEvent from './ViewEvent.jsx';
 
 export default React.createClass({
-    mixins: [React.addons.LinkedStateMixin],
     refresh(eventId){
         eventId = (eventId !== undefined && eventId !== null) ? eventId : this.props.eventId;
         this.setState({
@@ -37,27 +38,7 @@ export default React.createClass({
             view: 'edit'
         });
     },
-    renderView(){
-        var event = this.state.model;
-        return <Modal.Body>
-                    {event.description}<br/>
-                    Attendees:
-                    <ul>
-                        {(event.subscribed.length > 0) ?
-                            event.subscribed.map(function(attendee, index){
-                                return <li key={index}>{attendee}</li>;
-                            }) : <i>None, be the first to register!</i>
-                        }
-                    </ul>
-                </Modal.Body>;
-    },
-    renderEdit(){
-        return <Modal.Body></Modal.Body>;
-    },
-    save(){
-
-    },
-    renderEditShow(){
+    renderControls(){
         var save = <Button key={1} onClick={this.save} bsStyle="success">Save</Button>;
         var cancel = <Button key={2} onClick={this.viewMode}>Cancel</Button>;
         var edit = <Button key={3} onClick={this.editMode}>Edit</Button>;
@@ -67,7 +48,10 @@ export default React.createClass({
         var buttons = [];
 
         if (this.state.view === 'edit') {
-            buttons.push(save, cancel);
+            buttons.push(save);
+            if (this.state.model.id !== undefined && this.state.model.id !== null) {
+                buttons.push(cancel);
+            }
         } else {
             if (Agenda.isAttending(this.state.model)){
                 buttons.push(leave);
@@ -92,9 +76,11 @@ export default React.createClass({
                     {(endDate.isSame(startDate, 'day')) ?
                         endDate.format('HH:mm') : endDate.format('D MMM HH:mm')} </Modal.Title>
                 </Modal.Header>
-                {(this.state.view === 'edit') ? this.renderEdit() : this.renderView()}
+                <Modal.Body>
+                {(this.state.view === 'edit') ? <EditEvent event={event}/> : <ViewEvent event={event}/>}
+                </Modal.Body>
                 <Modal.Footer>
-                    {this.renderEditShow()}
+                    {this.renderControls()}
                 </Modal.Footer>
             </Modal>;
     }

@@ -116,7 +116,8 @@ gulp.task('styles', function() {
     return gulp.src(config.mainLess)
         .pipe(changed(config.distCss))
         .pipe(less({
-            paths: [config.npmDir + '/bootstrap/less/']
+            paths: [config.npmDir + '/bootstrap/less/',
+            config.npmDir + '/react-datepicker/dist/']
         }))
         .on('error', notify.onError())
         .pipe(postcss([autoprefixer('last 1 version')]))
